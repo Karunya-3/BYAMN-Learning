@@ -44,6 +44,9 @@ jobs:
             
             let processedCount = 0;
             let unassignedCount = 0;
+
+            // ADDED: List to store unassigned issue numbers
+            let unassignedList = [];
             
             for (const issue of issues) {
               // Skip if it's a pull request (issues and PRs share the same API)
@@ -159,6 +162,10 @@ jobs:
                 });
                 
                 unassignedCount++;
+
+                // ADDED: Push issue number to list
+                unassignedList.push(issue.number);
+
                 console.log(`✅ Successfully unassigned and commented on issue #${issue.number}`);
                 
               } catch (error) {
@@ -173,6 +180,14 @@ jobs:
             
             // Create a summary comment if any issues were unassigned
             if (unassignedCount > 0) {
+
+              // ADDED: Table for unassigned issues
+              const issueTable = [
+                '| Issue Number | Status |',
+                '|--------------|--------|',
+                ...unassignedList.map(num => `| #${num} | Unassigned / Available |`)
+              ].join('\n');
+
               const summaryBody = [
                 '## Daily Auto-unassignment Report',
                 '',
@@ -180,6 +195,9 @@ jobs:
                 `🔢 **Issues Processed**: ${processedCount}`,
                 `🚨 **Issues Unassigned**: ${unassignedCount}`,
                 `⏰ **Threshold**: ${daysThreshold} days`,
+                '',
+                '### Unassigned Issues',
+                issueTable,
                 '',
                 '### What was done?',
                 '- Checked all open assigned issues',
