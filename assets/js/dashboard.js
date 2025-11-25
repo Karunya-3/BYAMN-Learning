@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize streak system
     let streakManager = null;
 
+    // Enhanced streak initialization in dashboard
     async function initializeStreakSystem() {
         const user = firebaseServices.auth.currentUser;
         if (!user) return;
@@ -46,50 +47,98 @@ document.addEventListener('DOMContentLoaded', function() {
             streakManager = window.initializeStreakManager();
             
             // Wait for streak data to load
+            const checkStreakReady = setInterval(() => {
+                if (streakManager && streakManager.isInitialized) {
+                    clearInterval(checkStreakReady);
+                    displayStreakOnDashboard(streakManager);
+                    displayWeeklyLearningPattern(streakManager);
+                    updateStreakAnalytics(streakManager);
+                }
+            }, 500);
+
+            // Timeout after 5 seconds
             setTimeout(() => {
-                displayStreakOnDashboard(streakManager);
-                displayWeeklyLearningPattern(streakManager);
-            }, 1000);
+                clearInterval(checkStreakReady);
+                if (streakManager) {
+                    displayStreakOnDashboard(streakManager);
+                }
+            }, 5000);
 
         } catch (error) {
             console.error('Error initializing streak system:', error);
+            // Show basic streak section even if initialization fails
+            createBasicStreakSection();
         }
     }
 
     // Display streak counter on dashboard
     function displayStreakOnDashboard(streakManager) {
+        // Remove existing streak sections to avoid duplicates
+        const existingStreakSections = document.querySelectorAll('[id*="streak"], .streak-section');
+        existingStreakSections.forEach(section => section.remove());
+
         const statsGrid = document.querySelector('.stats-grid') || 
                          document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-4.gap-6');
         
         if (!statsGrid) {
-            console.log('Stats grid not found, creating streak section');
+            console.log('Stats grid not found, creating dedicated streak section');
             createStreakSection(streakManager);
             return;
         }
 
         const streakStats = streakManager.getStreakStats();
+        const weeklyPattern = streakManager.getWeeklyPattern();
+        const learnedThisWeek = weeklyPattern.filter(day => day.learned).length;
         
         const streakHTML = `
-            <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all duration-300 hover-lift">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-lg bg-gradient-to-r from-orange-500 to-red-500">
-                        <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                        </svg>
+            <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all duration-300 hover-lift streak-card">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 streak-flame">
+                            <svg class="h-6 w-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-semibold text-gray-900">Learning Streak</h3>
+                            <p class="text-2xl font-bold text-orange-600">${streakStats.currentStreak} days</p>
+                        </div>
                     </div>
-                    <div class="ml-4">
-                        <h3 class="text-lg font-medium text-gray-900">Learning Streak</h3>
-                        <p class="text-2xl font-bold text-orange-600">${streakStats.currentStreak} days</p>
-                        <p class="text-sm text-gray-500">Longest: ${streakStats.longestStreak} days</p>
+                    <div class="text-right">
+                        <p class="text-sm text-gray-500">Longest</p>
+                        <p class="text-lg font-semibold text-gray-700">${streakStats.longestStreak} days</p>
                     </div>
                 </div>
+                
+                <!-- Weekly Progress -->
+                <div class="mb-4">
+                    <div class="flex justify-between text-sm text-gray-600 mb-2">
+                        <span>This Week</span>
+                        <span>${learnedThisWeek}/7 days</span>
+                    </div>
+                    <div class="flex gap-1">
+                        ${weeklyPattern.map(day => `
+                            <div class="flex-1 text-center">
+                                <div class="h-2 rounded-full mb-1 ${day.learned ? 'bg-green-500' : 'bg-gray-200'}"></div>
+                                <div class="text-xs text-gray-500">${day.day.charAt(0)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
                 ${streakStats.currentStreak > 0 ? `
-                <div class="mt-3 p-2 bg-orange-50 rounded-lg">
-                    <p class="text-xs text-orange-700 text-center">
+                <div class="mt-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
+                    <p class="text-sm text-orange-800 text-center">
                         ${streakManager.getMotivationalMessage()}
                     </p>
                 </div>
-                ` : ''}
+                ` : `
+                <div class="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <p class="text-sm text-blue-800 text-center">
+                        Complete a lesson today to start your learning streak! 🎯
+                    </p>
+                </div>
+                `}
             </div>
         `;
 
@@ -106,21 +155,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const streakStats = streakManager.getStreakStats();
         const weeklyPattern = streakManager.getWeeklyPattern();
+        const learnedThisWeek = weeklyPattern.filter(day => day.learned).length;
+        const streakProgress = streakManager.getStreakProgress();
+        const nextMilestone = streakManager.getNextMilestone();
 
         const streakSectionHTML = `
-            <div class="mb-8">
+            <div class="mb-8 streak-section">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Streak Card -->
                     <div class="bg-white rounded-xl shadow-md p-6 hover-lift">
                         <div class="flex items-center justify-between mb-4">
                             <h2 class="text-xl font-bold text-gray-900">Learning Streak</h2>
-                            <div class="flex items-center space-x-1">
-                                <svg class="h-5 w-5 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd"/>
-                                </svg>
+                            <div class="flex items-center space-x-2">
+                                <div class="p-2 rounded-lg bg-orange-100 streak-flame">
+                                    <svg class="h-5 w-5 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
                                 <span class="text-2xl font-bold text-orange-600">${streakStats.currentStreak}</span>
                             </div>
                         </div>
+                        
+                        <!-- Progress to next milestone -->
+                        ${nextMilestone > streakStats.currentStreak ? `
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm text-gray-600 mb-1">
+                                <span>Progress to ${nextMilestone} days</span>
+                                <span>${streakProgress}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-orange-500 h-2 rounded-full transition-all duration-500" style="width: ${streakProgress}%"></div>
+                            </div>
+                        </div>
+                        ` : ''}
                         
                         <div class="space-y-3">
                             <div class="flex justify-between text-sm">
@@ -134,6 +201,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Total Learning Days</span>
                                 <span class="font-semibold">${streakStats.totalLearningDays}</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Learned This Week</span>
+                                <span class="font-semibold">${learnedThisWeek}/7 days</span>
                             </div>
                         </div>
 
@@ -157,27 +228,33 @@ document.addEventListener('DOMContentLoaded', function() {
                     <!-- Weekly Pattern -->
                     <div class="bg-white rounded-xl shadow-md p-6 hover-lift">
                         <h3 class="text-lg font-bold text-gray-900 mb-4">This Week's Learning</h3>
-                        <div class="space-y-2">
+                        <div class="space-y-3">
                             ${weeklyPattern.map(day => `
                                 <div class="flex items-center justify-between">
                                     <span class="text-sm font-medium text-gray-600 w-8">${day.day}</span>
                                     <div class="flex-1 mx-2">
-                                        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                            <div class="h-full ${day.learned ? 'bg-green-500' : 'bg-gray-300'} rounded-full" 
+                                        <div class="h-3 bg-gray-200 rounded-full overflow-hidden">
+                                            <div class="h-full ${day.learned ? 'bg-green-500' : 'bg-gray-300'} rounded-full transition-all duration-500" 
                                                  style="width: ${day.learned ? '100%' : '0%'}"></div>
                                         </div>
                                     </div>
-                                    <span class="text-xs text-gray-500 w-12 text-right">
-                                        ${day.learned ? '✓ Learned' : '—'}
+                                    <span class="text-xs text-gray-500 w-16 text-right">
+                                        ${day.learned ? 
+                                            `${day.lessonsCompleted} lesson${day.lessonsCompleted !== 1 ? 's' : ''}` : 
+                                            '—'
+                                        }
                                     </span>
                                 </div>
                             `).join('')}
                         </div>
                         
-                        <div class="mt-4 pt-3 border-t border-gray-200">
-                            <div class="flex justify-between text-xs text-gray-500">
+                        <div class="mt-4 pt-4 border-t border-gray-200">
+                            <div class="flex justify-between text-sm text-gray-600">
                                 <span>Weekly Consistency</span>
-                                <span>${weeklyPattern.filter(day => day.learned).length}/7 days</span>
+                                <span class="font-semibold">${learnedThisWeek}/7 days</span>
+                            </div>
+                            <div class="mt-2 w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-green-500 h-2 rounded-full transition-all duration-500" style="width: ${(learnedThisWeek / 7) * 100}%"></div>
                             </div>
                         </div>
                     </div>
@@ -194,9 +271,51 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Display weekly learning pattern
+    // Create basic streak section if initialization fails
+    function createBasicStreakSection() {
+        const dashboardContainer = document.querySelector('main') || 
+                                  document.getElementById('courses-container')?.parentElement;
+        
+        if (!dashboardContainer) return;
+
+        const basicStreakHTML = `
+            <div class="mb-8 streak-section">
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-900">Learning Streak</h2>
+                            <p class="text-gray-600">Start learning to build your streak!</p>
+                        </div>
+                        <div class="p-3 rounded-lg bg-gray-100">
+                            <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const firstChild = dashboardContainer.firstElementChild;
+        if (firstChild) {
+            firstChild.insertAdjacentHTML('beforebegin', basicStreakHTML);
+        } else {
+            dashboardContainer.insertAdjacentHTML('afterbegin', basicStreakHTML);
+        }
+    }
+
+    // Update streak analytics in the analytics section
+    function updateStreakAnalytics(streakManager) {
+        const learningStreakElement = document.getElementById('learning-streak');
+        if (learningStreakElement && streakManager) {
+            const streakStats = streakManager.getStreakStats();
+            learningStreakElement.textContent = streakStats.currentStreak;
+        }
+    }
+
+    // Display weekly learning pattern in analytics
     function displayWeeklyLearningPattern(streakManager) {
-        // This is already included in the streak section above
+        // This is handled in the streak section creation
     }
 
     // Load bookmarked courses
@@ -664,7 +783,7 @@ document.addEventListener('DOMContentLoaded', function() {
             achievementsContainer.innerHTML = `
                 <div class="text-center py-8 col-span-full">
                     <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <h3 class="mt-4 text-lg font-medium text-gray-900">No achievements yet</h3>
                     <p class="mt-2 text-gray-500">Start learning to earn your first achievement!</p>
@@ -714,7 +833,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 iconHTML = `
                     <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 16.121A3 3 0 107 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z"></path>
                     </svg>
                 `;
                 break;

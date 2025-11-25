@@ -3827,7 +3827,7 @@ body.theme-transition * {
     border: 1px solid #10B981;
 }
 
-/* Learning Streak Styles */
+/* Streak Animation Styles */
 .streak-flame {
     animation: flame-flicker 2s ease-in-out infinite alternate;
 }
@@ -3892,4 +3892,10 @@ body.theme-transition * {
 
 .learning-day.today {
     border: 2px solid #f59e0b;
+}
+
+/* Streak card hover effects */
+.streak-card:hover .streak-flame {
+    animation-duration: 1s;
+    transform: scale(1.1);
 }
