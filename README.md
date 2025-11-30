@@ -1,10 +1,4 @@
-```{=html}
-<p align="center">
-```
-`<img src="main.svg" alt="Main" width="300" />`{=html}
-```{=html}
-</p>
-```
+
 # BYAMN Learning Platform
 
 Transform YouTube learning into verified achievement with free
