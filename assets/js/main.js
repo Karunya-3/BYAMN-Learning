@@ -322,3 +322,74 @@ if (window.location.pathname.includes("/auth/")) {
     logoLink.href = "./index.html";
     logoImg.src = "./logo.png";
 }
+
+/* Tiny feature: dynamic year + footer subscribe handler (non-intrusive) */
+(function () {
+  // Dynamic copyright year
+  try {
+    const yearEl = document.getElementById('byamn-year');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+  } catch (e) {
+    console.error('byamn-year set error:', e);
+  }
+
+  // Subscribe handler wiring (idempotent)
+  try {
+    const form = document.getElementById('byamn-subscribe-form');
+    const input = document.getElementById('byamn-email');
+    const btn = document.getElementById('byamn-subscribe-btn');
+
+    // only wire once
+    if (form && input && btn && !form.dataset.byamnWired) {
+      form.dataset.byamnWired = 'true';
+
+      async function handleSubmit(e) {
+        e.preventDefault();
+        const email = (input.value || '').trim();
+        if (!email) {
+          if (window.utils && typeof window.utils.showNotification === 'function') {
+            window.utils.showNotification('Please enter a valid email.', 'warning');
+          } else {
+            alert('Please enter a valid email.');
+          }
+          return;
+        }
+
+        input.disabled = true;
+        btn.disabled = true;
+
+        try {
+          if (typeof window.subscribeNewsletter === 'function') {
+            // If you implemented a real subscription function elsewhere, use it.
+            await window.subscribeNewsletter(email);
+          } else {
+            // fallback (simulated)
+            await new Promise((r) => setTimeout(r, 700));
+          }
+
+          if (window.utils && typeof window.utils.showNotification === 'function') {
+            window.utils.showNotification('Thanks! You are subscribed — we will keep you updated.', 'success');
+          } else {
+            alert('Thanks! You are subscribed — we will keep you updated.');
+          }
+          input.value = '';
+        } catch (err) {
+          console.error('subscribe error:', err);
+          if (window.utils && typeof window.utils.showNotification === 'function') {
+            window.utils.showNotification('Sorry — something went wrong. Try again later.', 'error');
+          } else {
+            alert('Sorry — something went wrong. Try again later.');
+          }
+        } finally {
+          input.disabled = false;
+          btn.disabled = false;
+        }
+      }
+
+      form.addEventListener('submit', handleSubmit);
+      btn.addEventListener('click', () => form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })));
+    }
+  } catch (e) {
+    console.error('subscribe wiring error:', e);
+  }
+})();
