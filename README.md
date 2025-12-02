@@ -87,6 +87,16 @@ configure your own Firebase project:
 3.  Update the Firebase configuration in `assets/js/firebase.js` with
     your project credentials
 
+### Loading Demo Data
+
+If you see "Error loading courses" on the homepage, you need to load the demo data:
+
+1. Open `load-demo-data.html` in your browser
+2. Click the "Load Demo Data" button
+3. Refresh the homepage to see the courses
+
+For more details, see `README-FIX.md`.
+
 ## Project Structure
 
     BYAMN-Learning/

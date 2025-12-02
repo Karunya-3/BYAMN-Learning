@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Test</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script type="module" src="./assets/js/firebase.js"></script>
+</head>
+<body>
+    <h1>Firebase Services Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        function displayResults() {
+            const resultsDiv = document.getElementById('results');
+            let html = '<h2>Test Results:</h2>';
+            
+            // Test if Firebase is loaded
+            html += '<p><strong>Firebase Loaded:</strong> ' + (typeof firebase !== 'undefined' ? 'Yes' : 'No') + '</p>';
+            
+            // Test if firebaseServices is available
+            html += '<p><strong>firebaseServices Available:</strong> ' + (typeof firebaseServices !== 'undefined' ? 'Yes' : 'No') + '</p>';
+            
+            if (typeof firebaseServices !== 'undefined') {
+                // List available services
+                const services = Object.keys(firebaseServices);
+                html += '<p><strong>Available Services:</strong> ' + services.join(', ') + '</p>';
+                
+                // Check specific required services
+                html += '<p><strong>Auth Service:</strong> ' + (firebaseServices.auth ? 'Available' : 'Not Available') + '</p>';
+                html += '<p><strong>RTDB Service:</strong> ' + (firebaseServices.rtdb ? 'Available' : 'Not Available') + '</p>';
+                
+                // Check specific methods
+                html += '<p><strong>signInWithEmailAndPassword:</strong> ' + (typeof firebaseServices.signInWithEmailAndPassword === 'function' ? 'Available' : 'Not Available') + '</p>';
+                html += '<p><strong>createUserWithEmailAndPassword:</strong> ' + (typeof firebaseServices.createUserWithEmailAndPassword === 'function' ? 'Available' : 'Not Available') + '</p>';
+                html += '<p><strong>fetchSignInMethodsForEmail:</strong> ' + (typeof firebaseServices.fetchSignInMethodsForEmail === 'function' ? 'Available' : 'Not Available') + '</p>';
+            }
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // Wait a bit for everything to load
+        setTimeout(displayResults, 2000);
+    </script>
+</body>
+</html>
