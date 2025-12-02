@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const lessonDescription = document.getElementById('lesson-description');
     const certificateBtn = document.getElementById('certificate-btn');
     const markCompleteBtn = document.getElementById('mark-complete-btn');
+    const markAllCompleteBtn = document.getElementById('mark-all-complete-btn'); // Added
     const nextLessonBtn = document.getElementById('next-lesson-btn');
     // Updated element references for new UI
     const progressPercent = document.getElementById('progress-percent-top'); // Changed from progress-percent
@@ -938,6 +939,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Hide all buttons initially
         certificateBtn.classList.add('hidden');
         markCompleteBtn.classList.add('hidden');
+        markAllCompleteBtn.classList.add('hidden'); // Added
         nextLessonBtn.classList.add('hidden');
         
         console.log('Updating button visibility - watchedTime:', watchedTime, 'minWatchTime:', minWatchTime);
@@ -946,60 +948,64 @@ document.addEventListener('DOMContentLoaded', function() {
             // Course completed - show certificate button
             certificateBtn.classList.remove('hidden');
             certificateBtn.href = `certificate.html?courseId=${currentCourse.id}`;
-        } else if (currentEnrollment && Array.isArray(currentEnrollment.completedLessons) && !currentEnrollment.completedLessons.includes(lesson.id)) {
-            // Lesson not completed - check if minimum watch time is required
-            if (minWatchTime > 0) {
-                // Calculate current total watched time (including currently playing time)
-                let currentWatchedTime = watchedTime;
-                if (watchStartTime) {
-                    const currentTime = new Date();
-                    const timeDiff = (currentTime - watchStartTime) / 1000; // Convert to seconds
-                    currentWatchedTime += timeDiff;
-                }
-                
-                console.log('Current watched time (seconds):', currentWatchedTime, 'Required (seconds):', minWatchTime);
-                
-                // Check if user has watched enough
-                if (currentWatchedTime >= minWatchTime) {
-                    // Minimum time requirement met - show mark as complete button
+        } else if (currentEnrollment && Array.isArray(currentEnrollment.completedLessons)) {
+            // Calculate completion percentage
+            const totalLessons = currentCourse.lessons.length;
+            const completedCount = currentEnrollment.completedLessons.length;
+            const completionPercentage = Math.round((completedCount / totalLessons) * 100);
+            
+            // Only show "Mark All as Complete" if not all lessons are completed
+            if (completionPercentage < 100) {
+                markAllCompleteBtn.classList.remove('hidden');
+            }
+            
+            // Current lesson not completed - check if minimum watch time is required
+            if (!currentEnrollment.completedLessons.includes(lesson.id)) {
+                if (minWatchTime > 0) {
+                    // Calculate current total watched time
+                    let currentWatchedTime = watchedTime;
+                    if (watchStartTime) {
+                        const currentTime = new Date();
+                        const timeDiff = (currentTime - watchStartTime) / 1000;
+                        currentWatchedTime += timeDiff;
+                    }
+                    
+                    if (currentWatchedTime >= minWatchTime) {
+                        markCompleteBtn.classList.remove('hidden');
+                        markCompleteBtn.disabled = false;
+                        markCompleteBtn.title = "Requirement met! Click to mark as complete";
+                        markCompleteBtn.onclick = () => markLessonCompleteWithOfflineSync(lesson.id);
+                    } else {
+                        markCompleteBtn.classList.remove('hidden');
+                        markCompleteBtn.disabled = true;
+                        const remainingTime = Math.ceil((minWatchTime - currentWatchedTime) / 60);
+                        markCompleteBtn.title = remainingTime > 0 ? `Watch ${remainingTime} more minute${remainingTime !== 1 ? 's' : ''} to unlock` : "Almost there...";
+                        markCompleteBtn.onclick = null;
+                    }
+                } else {
                     markCompleteBtn.classList.remove('hidden');
                     markCompleteBtn.disabled = false;
-                    markCompleteBtn.title = "Requirement met! Click to mark as complete"; // Update tooltip
+                    markCompleteBtn.title = "Click to mark as complete";
                     markCompleteBtn.onclick = () => markLessonCompleteWithOfflineSync(lesson.id);
-                    console.log('Button enabled - time requirement met');
-                } else {
-                    // Minimum time requirement not met - disable button
-                    markCompleteBtn.classList.remove('hidden');
-                    markCompleteBtn.disabled = true;
-                    const remainingTime = Math.ceil((minWatchTime - currentWatchedTime) / 60);
-                    markCompleteBtn.title = remainingTime > 0 ? `Watch ${remainingTime} more minute${remainingTime !== 1 ? 's' : ''} to unlock` : "Almost there...";
-                    markCompleteBtn.onclick = null;
-                    console.log('Button disabled - time requirement not met yet. Need', Math.ceil(minWatchTime - currentWatchedTime), 'more seconds');
+                }
+                
+                // Show next lesson button if not the last lesson
+                if (currentLessonIndex < currentCourse.lessons.length - 1) {
+                    nextLessonBtn.classList.remove('hidden');
+                    nextLessonBtn.onclick = () => loadLesson(currentLessonIndex + 1);
                 }
             } else {
-                // No minimum time requirement - show mark as complete button
-                markCompleteBtn.classList.remove('hidden');
-                markCompleteBtn.disabled = false;
-                markCompleteBtn.title = "Click to mark as complete"; // Update tooltip
-                markCompleteBtn.onclick = () => markLessonCompleteWithOfflineSync(lesson.id);
-            }
-            
-            // Show next lesson button if not the last lesson
-            if (currentLessonIndex < currentCourse.lessons.length - 1) {
-                nextLessonBtn.classList.remove('hidden');
-                nextLessonBtn.onclick = () => loadLesson(currentLessonIndex + 1);
-            }
-        } else {
-            // Lesson already completed - show next lesson button if not the last lesson
-            if (currentLessonIndex < currentCourse.lessons.length - 1) {
-                nextLessonBtn.classList.remove('hidden');
-                nextLessonBtn.onclick = () => loadLesson(currentLessonIndex + 1);
-            }
-            
-            // If it's the last lesson and course is completed, show certificate button
-            if (currentLessonIndex === currentCourse.lessons.length - 1 && currentEnrollment.progress === 100) {
-                certificateBtn.classList.remove('hidden');
-                certificateBtn.href = `certificate.html?courseId=${currentCourse.id}`;
+                // Lesson already completed - show next lesson button if not the last lesson
+                if (currentLessonIndex < currentCourse.lessons.length - 1) {
+                    nextLessonBtn.classList.remove('hidden');
+                    nextLessonBtn.onclick = () => loadLesson(currentLessonIndex + 1);
+                }
+                
+                // If it's the last lesson and course is completed, show certificate button
+                if (currentLessonIndex === currentCourse.lessons.length - 1 && currentEnrollment.progress === 100) {
+                    certificateBtn.classList.remove('hidden');
+                    certificateBtn.href = `certificate.html?courseId=${currentCourse.id}`;
+                }
             }
         }
     }
@@ -1604,6 +1610,173 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+
+    // Mark all lessons complete function
+    function markAllLessonsComplete() {
+        if (!currentCourse || !currentEnrollment || !currentUser) {
+            utils.showNotification('Cannot mark all lessons. Please try again.', 'error');
+            return;
+        }
+
+        // Show confirmation dialog
+        if (!confirm('Are you sure you want to mark all lessons in this course as complete? This action cannot be undone.')) {
+            return;
+        }
+
+        // Show loading state
+        const originalButtonText = markAllCompleteBtn ? markAllCompleteBtn.innerHTML : '';
+        if (markAllCompleteBtn) {
+            markAllCompleteBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.gstatic.com/firebasejs/10.7.1/firebase-app.js" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Marking All...';
+            markAllCompleteBtn.disabled = true;
+        }
+
+        // Get all lesson IDs
+        const allLessonIds = currentCourse.lessons.map(lesson => lesson.id);
+        const completedLessons = [...new Set([...(currentEnrollment.completedLessons || []), ...allLessonIds])];
+        const progress = 100;
+
+        // Use offline sync if available
+        if (window.offlineSyncManager && currentUser) {
+            // Mark all lessons complete with offline support
+            markAllLessonsCompleteOffline(allLessonIds, completedLessons, progress);
+        } else {
+            // Use Firebase directly
+            markAllLessonsCompleteFirebase(allLessonIds, completedLessons, progress, originalButtonText);
+        }
+    }
+
+    // Function to mark all lessons complete with offline support
+    async function markAllLessonsCompleteOffline(allLessonIds, completedLessons, progress) {
+        try {
+            // Store progress for each lesson locally
+            for (const lessonId of allLessonIds) {
+                if (!currentEnrollment.completedLessons.includes(lessonId)) {
+                    await window.offlineSyncManager.storeLocalProgress(
+                        currentUser.uid,
+                        courseId,
+                        lessonId,
+                        100,
+                        0 // 0 time spent for quick completion
+                    );
+                    
+                    // Queue for sync
+                    const progressData = {
+                        userId: currentUser.uid,
+                        courseId: courseId,
+                        lessonId: lessonId,
+                        progress: 100,
+                        timeSpent: 0,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    await window.offlineSyncManager.queueProgressUpdate(progressData);
+                    
+                    // Track learning activity
+                    await trackLearningActivity(lessonId, courseId, 0);
+                }
+            }
+            
+            // Update local enrollment state
+            currentEnrollment.completedLessons = completedLessons;
+            currentEnrollment.progress = progress;
+            
+            // Update UI
+            updateAllLessonsCompleteUI(progress);
+            
+            // Show success message
+            utils.showNotification('All lessons marked as complete! Progress will sync when online.', 'success');
+            
+        } catch (error) {
+            console.error('Error marking all lessons complete offline:', error);
+            utils.showNotification('Error: ' + error.message, 'error');
+        } finally {
+            // Reset button state
+            if (markAllCompleteBtn) {
+                markAllCompleteBtn.innerHTML = 'Mark All as Complete';
+                markAllCompleteBtn.disabled = false;
+            }
+        }
+    }
+
+    // Function to mark all lessons complete using Firebase directly
+    async function markAllLessonsCompleteFirebase(allLessonIds, completedLessons, progress, originalButtonText) {
+        try {
+            // Update enrollment in Firebase
+            const enrollmentRef = firebaseServices.ref('enrollments/' + currentEnrollment.id);
+            await firebaseServices.update(enrollmentRef, {
+                completedLessons: completedLessons,
+                progress: progress,
+                lastAccessed: new Date().toISOString()
+            });
+            
+            // Update local state
+            currentEnrollment.completedLessons = completedLessons;
+            currentEnrollment.progress = progress;
+            
+            // Track learning activity for each lesson
+            for (const lessonId of allLessonIds) {
+                if (!currentEnrollment.completedLessons.includes(lessonId)) {
+                    await trackLearningActivity(lessonId, currentCourse.id, 0);
+                }
+            }
+            
+            // Update course completion analytics
+            if (progress === 100) {
+                markCourseComplete();
+            }
+            
+            // Update UI
+            updateAllLessonsCompleteUI(progress);
+            
+            utils.showNotification('All lessons marked as complete! Course completed!', 'success');
+            
+        } catch (error) {
+            console.error('Error marking all lessons as complete:', error);
+            utils.showNotification('Error marking all lessons as complete: ' + error.message, 'error');
+        } finally {
+            // Reset button state
+            if (markAllCompleteBtn) {
+                markAllCompleteBtn.innerHTML = originalButtonText;
+                markAllCompleteBtn.disabled = false;
+            }
+        }
+    }
+
+    // Helper function to update UI after marking all lessons complete
+    function updateAllLessonsCompleteUI(progress) {
+        // Update progress display
+        updateProgress();
+        
+        // Refresh the lessons list to show all as complete
+        renderLessonsList();
+        
+        // Load the current lesson to show completion status
+        if (currentCourse.lessons.length > 0) {
+            loadLesson(currentLessonIndex);
+        }
+    }
+
+    // Add event listener for the mark all complete button
+    if (markAllCompleteBtn) {
+        markAllCompleteBtn.addEventListener('click', function() {
+            markAllLessonsComplete();
+        });
+    }
+
+    // Helper function for updating progress display
+    function updateProgressDisplay(progress) {
+        if (progressPercent) progressPercent.textContent = `${progress}%`;
+        if (progressPercentTop) progressPercentTop.textContent = `${progress}%`;
+        if (progressPercentTopMain) progressPercentTopMain.textContent = `${progress}% Complete`;
+        if (progressBar) progressBar.style.width = `${progress}%`;
+    }
+
+    // Helper function for updating lesson navigation
+    function updateLessonNavigation() {
+        // This function can be expanded if needed
+        const lesson = currentCourse.lessons[currentLessonIndex];
+        updateButtonVisibility(lesson);
+    }
 });
 
 // Add modal elements to global scope
