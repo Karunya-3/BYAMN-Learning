@@ -17,16 +17,17 @@
     <link rel="stylesheet" href="../assets/css/styles.css">
 
     <!-- Firebase SDK - Using compat versions without type="module" -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
-    <!-- Firebase configuration -->
-    <script src="../assets/js/firebase.js"></script>
     <!-- AOS (Animate On Scroll) CSS -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Firebase configuration -->
+    <script type="module" src="../assets/js/firebase.js"></script>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
     <!-- Header -->
@@ -217,7 +218,6 @@
     <script>
         AOS.init();
     </script>
-    <script type="module" src="../assets/js/auth-state.js"></script>
     <script src="../assets/js/main.js"></script>
     <script src="../assets/js/auth.js"></script>
 </body>

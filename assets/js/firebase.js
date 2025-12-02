@@ -1,16 +1,12 @@
 // Firebase configuration and initialization for client-side
 // CORRECTED VERSION - Uses your actual credentials from .env
 
-// Import Firebase modules
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, fetchSignInMethodsForEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, collection, getDoc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getDatabase, ref, get, set, push, query, orderByChild, equalTo, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+// Firebase is loaded via compat scripts, access via global firebase namespace
 
 // Your Firebase configuration from .env
 // NOTE: For client-side apps, these credentials are PUBLIC and that's okay!
 // Firebase security is handled through Security Rules, not by hiding credentials
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyCDlU6SzJK4acxccwoU1MGAZuOa1Na2qTw",
   authDomain: "byamn-learning.firebaseapp.com",
@@ -27,34 +23,71 @@ let app, analytics, auth, db, rtdb;
 
 try {
   console.log('Initializing Firebase...');
-  app = initializeApp(firebaseConfig);
+  console.log('Firebase config:', firebaseConfig);
+  app = firebase.initializeApp(firebaseConfig);
   console.log('Firebase app initialized successfully');
   
   // Initialize Analytics (optional, may fail in some environments)
   try {
-    analytics = getAnalytics(app);
+    analytics = firebase.analytics();
     console.log('Firebase Analytics initialized');
   } catch (analyticsError) {
     console.warn('Firebase Analytics not available:', analyticsError.message);
   }
   
   // Initialize Auth
-  auth = getAuth(app);
+  auth = firebase.auth();
   console.log('Firebase Auth initialized');
   
   // Initialize Firestore
-  db = getFirestore(app);
+  db = firebase.firestore();
   console.log('Firestore initialized');
   
   // Initialize Realtime Database
-  rtdb = getDatabase(app);
+  rtdb = firebase.database();
   console.log('Realtime Database initialized');
   console.log('Database URL:', firebaseConfig.databaseURL);
   
+  // Test database connection
+  setTimeout(async () => {
+    try {
+      if (rtdb) {
+        console.log('Testing database connection...');
+        const testRef = firebase.database().ref('.info/connected');
+        testRef.on('value', function(snap) {
+          if (snap.val() === true) {
+            console.log('Firebase database connection successful');
+          } else {
+            console.warn('Firebase database connection failed');
+          }
+        });
+      }
+    } catch (testError) {
+      console.error('Database connection test failed:', testError);
+    }
+  }, 1000);
+  
 } catch (error) {
   console.error('FATAL: Firebase initialization failed:', error);
-  alert('Failed to connect to Firebase. Please check your internet connection and refresh the page.');
+  console.error('Error details:', {
+    message: error.message,
+    code: error.code,
+    name: error.name,
+    stack: error.stack
+  });
+  alert('Failed to connect to Firebase. Please check your internet connection and refresh the page.\n\nError: ' + error.message);
 }
+
+// Ensure firebaseServices is properly defined even if initialization fails
+if (typeof window.firebaseServices === 'undefined') {
+  window.firebaseServices = {};
+}
+
+// Add a small delay to ensure all services are properly initialized
+setTimeout(() => {
+  console.log('Firebase services fully initialized');
+  window.firebaseServicesInitialized = true;
+}, 1000);
 
 // Helper function to normalize different date formats
 function getNormalizedDate(dateValue) {
@@ -86,6 +119,65 @@ function getNormalizedDate(dateValue) {
   return new Date(0);
 }
 
+// Helper function to process categories data
+function processCategoriesData(categoriesData) {
+    const categories = [];
+    if (categoriesData) {
+        // Handle different data structures
+        if (Array.isArray(categoriesData)) {
+            // If it's already an array
+            categoriesData.forEach((category, index) => {
+                categories.push({ id: category.id || `category-${index}`, ...category });
+            });
+        } else if (typeof categoriesData === 'object') {
+            // If it's an object with keys (Firebase Realtime Database structure)
+            Object.keys(categoriesData).forEach(key => {
+                // Add the ID from the key and merge with the category data
+                categories.push({ id: key, ...categoriesData[key] });
+            });
+        }
+    }
+    console.log('Processed categories array:', categories);
+    return categories;
+}
+
+// Helper function to process courses data
+function processCoursesData(coursesData) {
+    const courses = [];
+    if (coursesData) {
+        // Handle different data structures
+        if (Array.isArray(coursesData)) {
+            // If it's already an array
+            coursesData.forEach((course, index) => {
+                courses.push({ id: course.id || `course-${index}`, ...course });
+            });
+        } else if (typeof coursesData === 'object') {
+            // If it's an object with keys (Firebase Realtime Database structure)
+            Object.keys(coursesData).forEach(key => {
+                // Add the ID from the key and merge with the course data
+                courses.push({ id: key, ...coursesData[key] });
+            });
+        }
+    }
+    console.log('Processed courses array:', courses);
+
+    // Add enrollmentCount if it doesn't exist (using a default value or calculating it)
+    courses.forEach(course => {
+        if (typeof course.enrollmentCount === 'undefined') {
+            course.enrollmentCount = 0; // Default value
+        }
+    });
+
+    courses.sort((a, b) => {
+        const dateA = getNormalizedDate(a.createdAt || a.created || a.date || a.timestamp);
+        const dateB = getNormalizedDate(b.createdAt || b.created || b.date || b.timestamp);
+        return dateB - dateA;
+    });
+
+    console.log('Sorted courses:', courses);
+    return courses;
+}
+
 // Export services for use in other modules
 window.firebaseServices = {
     app,
@@ -94,29 +186,91 @@ window.firebaseServices = {
     rtdb,
     analytics,
     
+    // Test connection function
+    testConnection: async function() {
+        try {
+            console.log('Testing Firebase connection...');
+            if (!rtdb) {
+                throw new Error('Realtime Database not initialized');
+            }
+            
+            // Test reading from root
+            const testRef = firebase.database().ref('/');
+            const snapshot = await testRef.once('value');
+            console.log('Firebase connection test successful. Root data exists:', snapshot.exists());
+            return true;
+        } catch (error) {
+            console.error('Firebase connection test failed:', error);
+            return false;
+        }
+    },
+    
+    // Validate database structure
+    validateDatabaseStructure: async function() {
+        try {
+            console.log('Validating database structure...');
+            
+            if (!rtdb) {
+                throw new Error('Realtime Database not initialized');
+            }
+            
+            // Check root structure
+            const rootRef = firebase.database().ref('/');
+            const rootSnapshot = await rootRef.once('value');
+            console.log('Root data:', rootSnapshot.exists() ? Object.keys(rootSnapshot.val() || {}) : 'No root data');
+            
+            // Check courses path
+            const coursesRef = firebase.database().ref('courses');
+            const coursesSnapshot = await coursesRef.once('value');
+            console.log('Courses path exists:', coursesSnapshot.exists());
+            if (coursesSnapshot.exists()) {
+                console.log('Courses data type:', typeof coursesSnapshot.val());
+                if (typeof coursesSnapshot.val() === 'object') {
+                    console.log('Courses keys:', Object.keys(coursesSnapshot.val() || {}).slice(0, 5));
+                }
+            }
+            
+            // Check categories path
+            const categoriesRef = firebase.database().ref('categories');
+            const categoriesSnapshot = await categoriesRef.once('value');
+            console.log('Categories path exists:', categoriesSnapshot.exists());
+            if (categoriesSnapshot.exists()) {
+                console.log('Categories data type:', typeof categoriesSnapshot.val());
+                if (typeof categoriesSnapshot.val() === 'object') {
+                    console.log('Categories keys:', Object.keys(categoriesSnapshot.val() || {}).slice(0, 5));
+                }
+            }
+            
+            return true;
+        } catch (error) {
+            console.error('Database structure validation failed:', error);
+            return false;
+        }
+    },
+    
     // Export helper functions directly
-    ref,
-    get,
-    set,
-    push,
-    query,
-    orderByChild,
-    equalTo,
-    remove,
-    update,
+    ref: (path) => firebase.database().ref(path),
+    get: (reference) => reference.once('value'),
+    set: (reference, data) => reference.set(data),
+    push: (reference) => reference.push(),
+    query: (reference, ...queries) => reference,
+    orderByChild: (path) => firebase.database().Reference.prototype.orderByChild(path),
+    equalTo: (value) => firebase.database().Reference.prototype.equalTo(value),
+    remove: (reference) => reference.remove(),
+    update: (reference, data) => reference.update(data),
     
     // Auth methods
-    signInWithEmailAndPassword: (email, password) => signInWithEmailAndPassword(auth, email, password),
-    createUserWithEmailAndPassword: (email, password) => createUserWithEmailAndPassword(auth, email, password),
-    signOut: () => signOut(auth),
-    onAuthStateChanged: (callback) => onAuthStateChanged(auth, callback),
-    fetchSignInMethodsForEmail: (email) => fetchSignInMethodsForEmail(auth, email),
+    signInWithEmailAndPassword: (email, password) => auth.signInWithEmailAndPassword(email, password),
+    createUserWithEmailAndPassword: (email, password) => auth.createUserWithEmailAndPassword(email, password),
+    signOut: () => auth.signOut(),
+    onAuthStateChanged: (callback) => auth.onAuthStateChanged(callback),
+    fetchSignInMethodsForEmail: (email) => auth.fetchSignInMethodsForEmail(email),
 
     // Database methods
-    getDoc: (reference) => getDoc(reference),
-    getDocs: (query) => getDocs(query),
-    doc: (path, id) => doc(db, path, id),
-    collection: (path) => collection(db, path),
+    getDoc: (reference) => reference.get(),
+    getDocs: (query) => query.get(),
+    doc: (path, id) => firebase.firestore().collection(path).doc(id),
+    collection: (path) => firebase.firestore().collection(path),
 
     // Bookmark functions
     saveBookmark: async (userId, courseId, savedAt) => {
@@ -163,46 +317,92 @@ window.firebaseServices = {
     // Helper functions for data operations
     getCourses: async () => {
         try {
+            console.log('Attempting to fetch courses from Firebase...');
             const coursesRef = ref(rtdb, 'courses');
+            console.log('Courses reference:', coursesRef.toString());
+            
+            // First check if the reference exists and is accessible
+            const existsCheck = await get(ref(rtdb, '/'));
+            console.log('Root reference exists:', existsCheck.exists());
+            
             const snapshot = await get(coursesRef);
-            const coursesData = snapshot.val();
-
-            const courses = [];
-            if (coursesData) {
-                Object.keys(coursesData).forEach(key => {
-                    courses.push({ id: key, ...coursesData[key] });
-                });
+            console.log('Courses snapshot exists:', snapshot.exists());
+            
+            if (!snapshot.exists()) {
+                console.warn('No courses data found at path: courses');
+                // Try alternative paths
+                const altRef1 = ref(rtdb, '/courses/');
+                const altSnapshot1 = await get(altRef1);
+                console.log('Alternative path 1 (/courses/) exists:', altSnapshot1.exists());
+                
+                if (altSnapshot1.exists()) {
+                    const coursesData = altSnapshot1.val();
+                    console.log('Courses data from alternative path:', coursesData);
+                    return processCoursesData(coursesData);
+                }
+                
+                // If no data found, return empty array
+                return [];
             }
+            
+            const coursesData = snapshot.val();
+            console.log('Courses data received:', coursesData);
 
-            courses.sort((a, b) => {
-                const dateA = getNormalizedDate(a.createdAt || a.created || a.date || a.timestamp);
-                const dateB = getNormalizedDate(b.createdAt || b.created || b.date || b.timestamp);
-                return dateB - dateA;
-            });
-
-            return courses;
+            return processCoursesData(coursesData);
         } catch (error) {
             console.error('Error fetching courses:', error);
+            console.error('Error details:', {
+                message: error.message,
+                code: error.code,
+                name: error.name,
+                stack: error.stack
+            });
             throw error;
         }
     },
 
     getCategories: async () => {
         try {
+            console.log('Attempting to fetch categories from Firebase...');
             const categoriesRef = ref(rtdb, 'categories');
+            console.log('Categories reference:', categoriesRef.toString());
+            
+            // First check if the reference exists and is accessible
+            const existsCheck = await get(ref(rtdb, '/'));
+            console.log('Root reference exists:', existsCheck.exists());
+            
             const snapshot = await get(categoriesRef);
-            const categoriesData = snapshot.val();
-
-            const categories = [];
-            if (categoriesData) {
-                Object.keys(categoriesData).forEach(key => {
-                    categories.push({ id: key, ...categoriesData[key] });
-                });
+            console.log('Categories snapshot exists:', snapshot.exists());
+            
+            if (!snapshot.exists()) {
+                console.warn('No categories data found at path: categories');
+                // Try alternative paths
+                const altRef1 = ref(rtdb, '/categories/');
+                const altSnapshot1 = await get(altRef1);
+                console.log('Alternative path 1 (/categories/) exists:', altSnapshot1.exists());
+                
+                if (altSnapshot1.exists()) {
+                    const categoriesData = altSnapshot1.val();
+                    console.log('Categories data from alternative path:', categoriesData);
+                    return processCategoriesData(categoriesData);
+                }
+                
+                // If no data found, return empty array
+                return [];
             }
+            
+            const categoriesData = snapshot.val();
+            console.log('Categories data received:', categoriesData);
 
-            return categories;
+            return processCategoriesData(categoriesData);
         } catch (error) {
             console.error('Error fetching categories:', error);
+            console.error('Error details:', {
+                message: error.message,
+                code: error.code,
+                name: error.name,
+                stack: error.stack
+            });
             throw error;
         }
     },
@@ -1216,6 +1416,16 @@ window.firebaseServices = {
         return Math.round(score);
     }
 };
+
+// Ensure all required services are available
+const requiredServices = ['auth', 'rtdb'];
+const missingServices = requiredServices.filter(service => !window.firebaseServices[service]);
+
+if (missingServices.length > 0) {
+  console.warn('Missing Firebase services:', missingServices);
+} else {
+  console.log('All required Firebase services are available');
+}
 
 console.log('Firebase services exported to window.firebaseServices');
 console.log('Available services:', Object.keys(window.firebaseServices));

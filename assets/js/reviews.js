@@ -38,10 +38,7 @@ function generateStarRating(rating, size = 'w-5 h-5') {
 }
 
 // Function to format date
-function formatDate(dateString) {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-}
+// Using formatDate from main.js via utils.formatDate
 
 // Function to render reviews
 function renderReviews(reviews, containerId, limit = 6) {
@@ -76,7 +73,7 @@ function renderReviews(reviews, containerId, limit = 6) {
                     </div>
                     <div class="ml-3">
                         <p class="text-sm font-medium text-gray-900">${review.username}</p>
-                        <p class="text-sm text-gray-500">${formatDate(review.date)}</p>
+                        <p class="text-sm text-gray-500">${utils.formatDate(review.date)}</p>
                     </div>
                 </div>
             </div>
@@ -172,7 +169,6 @@ document.addEventListener('DOMContentLoaded', function() {
 window.reviewsSystem = {
     fakeReviews,
     generateStarRating,
-    formatDate,
     renderReviews,
     calculateAverageRating,
     renderReviewSummary
