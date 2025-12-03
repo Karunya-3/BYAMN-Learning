@@ -18,6 +18,13 @@
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
+  <!-- Firebase SDK - Using compat versions without type="module" -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
   <style>
     body { font-family: 'Inter', sans-serif; }
     details[open] summary svg { transform: rotate(180deg); }
@@ -46,8 +53,8 @@
 
         <!-- Desktop actions -->
         <div class="hidden md:flex space-x-3">
-          <a href="auth/login.html" class="px-4 py-2 border border-indigo-500 text-indigo-600 rounded-lg hover:bg-indigo-50">Login</a>
-          <a href="auth/register.html" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Get Started</a>
+          <a href="auth/login.html" id="login-btn" class="px-4 py-2 border border-indigo-500 text-indigo-600 rounded-lg hover:bg-indigo-50">Login</a>
+          <a href="auth/register.html" id="signup-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Get Started</a>
         </div>
 
         <!-- Mobile hamburger button -->
@@ -75,8 +82,8 @@
         <a href="contact.html" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-indigo-50">Contact</a>
 
         <div class="pt-2 border-t border-neutral-100 flex gap-2">
-          <a href="auth/login.html" class="flex-1 text-center px-3 py-2 border border-indigo-500 text-indigo-600 rounded-md">Login</a>
-          <a href="auth/register.html" class="flex-1 text-center px-3 py-2 bg-indigo-600 text-white rounded-md">Get Started</a>
+          <a href="auth/login.html" id="login-btn" class="flex-1 text-center px-3 py-2 border border-indigo-500 text-indigo-600 rounded-md">Login</a>
+          <a href="auth/register.html" id="signup-btn" class="flex-1 text-center px-3 py-2 bg-indigo-600 text-white rounded-md">Get Started</a>
         </div>
       </div>
     </div>
@@ -434,5 +441,11 @@
       });
     })();
   </script>
+  
+  <!-- Firebase configuration -->
+  <script type="module" src="./assets/js/firebase.js"></script>
+  
+  <!-- Main JavaScript -->
+  <script src="assets/js/main.js"></script>
 </body>
 </html>

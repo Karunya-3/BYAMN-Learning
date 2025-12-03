@@ -525,17 +525,16 @@ function formatDuration(seconds) {
 }
 
 // Utility function to filter courses
-function filterCourses(courses, searchTerm, category, difficulty, duration, instructor) {
+function filterCourses(courses, searchTerm, category, difficulty, duration) {
     return courses.filter(course => {
         // Search term filter
         if (searchTerm) {
             const searchLower = searchTerm.toLowerCase();
             const titleMatch = course.title && course.title.toLowerCase().includes(searchLower);
             const descriptionMatch = course.description && course.description.toLowerCase().includes(searchLower);
-            const instructorMatch = course.instructor && course.instructor.toLowerCase().includes(searchLower);
             const categoryMatch = categoryMap[course.category] && categoryMap[course.category].toLowerCase().includes(searchLower);
             
-            if (!titleMatch && !descriptionMatch && !instructorMatch && !categoryMatch) {
+            if (!titleMatch && !descriptionMatch && !categoryMatch) {
                 return false;
             }
         }
@@ -556,11 +555,6 @@ function filterCourses(courses, searchTerm, category, difficulty, duration, inst
             if (courseDuration !== duration) {
                 return false;
             }
-        }
-        
-        // Instructor filter
-        if (instructor !== 'all' && course.instructor !== instructor) {
-            return false;
         }
         
         return true;
@@ -655,10 +649,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const sortSelect = document.getElementById('sort-options');
     const difficultyFilterSelect = document.getElementById('difficulty-filter');
     const durationFilterSelect = document.getElementById('duration-filter');
-    const instructorFilterSelect = document.getElementById('instructor-filter');
-    const clearFiltersBtn = document.getElementById('clear-filters');
+
+    const clearFiltersBtn = document.getElementById('reset-filters');
     const resultsCount = document.getElementById('results-count');
-    const bookmarksFilterBtn = document.getElementById('bookmarks-filter');
+
     const clearSearchBtn = document.getElementById('clear-search');
     const searchSuggestions = document.getElementById('search-suggestions');
     const recommendationsSection = document.getElementById('recommendations-section');
@@ -670,8 +664,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load collections
     loadUserCollections();
 
-    // Load courses and categories when page loads
-    loadCategoriesAndCourses();
+    // Wait a bit for Firebase to initialize, then load courses and categories
+    setTimeout(loadCategoriesAndCourses, 1000);
 
     // Add search event listener with enhanced functionality
     if (searchInput) {
@@ -748,42 +742,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Add instructor filter event listener
-    if (instructorFilterSelect) {
-        instructorFilterSelect.addEventListener('change', function(e) {
-            instructorFilter = e.target.value;
-            applyFilters();
-        });
-    }
 
-    // Add bookmarks filter event listener
-    if (bookmarksFilterBtn) {
-        bookmarksFilterBtn.addEventListener('click', function() {
-            const isActive = bookmarksFilterBtn.classList.contains('active');
-            
-            if (!isActive) {
-                // Activate bookmarks filter
-                bookmarksFilterBtn.classList.add('active');
-                bookmarksFilterBtn.innerHTML = `
-                    <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" clip-rule="evenodd" />
-                    </svg>
-                    My Bookmarks (${bookmarkedCourses.size})
-                `;
-                applyBookmarksFilter();
-            } else {
-                // Deactivate bookmarks filter
-                bookmarksFilterBtn.classList.remove('active');
-                bookmarksFilterBtn.innerHTML = `
-                    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                    </svg>
-                    My Bookmarks
-                `;
-                applyFilters();
-            }
-        });
-    }
+
+
 
     // Add clear filters event listener
     if (clearFiltersBtn) {
@@ -796,23 +757,11 @@ document.addEventListener('DOMContentLoaded', function() {
             instructorFilter = 'all';
             currentSort = 'newest';
             
-            // Reset bookmarks filter
-            if (bookmarksFilterBtn) {
-                bookmarksFilterBtn.classList.remove('active');
-                bookmarksFilterBtn.innerHTML = `
-                    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                    </svg>
-                    My Bookmarks
-                `;
-            }
-            
             // Reset UI elements
             if (searchInput) searchInput.value = '';
             if (sortSelect) sortSelect.value = 'newest';
             if (difficultyFilterSelect) difficultyFilterSelect.value = 'all';
             if (durationFilterSelect) durationFilterSelect.value = 'all';
-            if (instructorFilterSelect) instructorFilterSelect.value = 'all';
             
             // Update active button styling
             document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -844,7 +793,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Apply all filters
     function applyFilters() {
         // Check if bookmarks filter is active
-        const isBookmarksFilterActive = bookmarksFilterBtn && bookmarksFilterBtn.classList.contains('active');
+        const isBookmarksFilterActive = false;
         
         if (isBookmarksFilterActive) {
             applyBookmarksFilter();
@@ -857,8 +806,7 @@ document.addEventListener('DOMContentLoaded', function() {
             currentSearchTerm, 
             currentFilter, 
             difficultyFilter, 
-            durationFilter, 
-            instructorFilter
+            durationFilter
         );
         
         // Sort courses
@@ -916,6 +864,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load categories and courses from Firebase
     async function loadCategoriesAndCourses() {
         try {
+            console.log('Starting to load categories and courses...');
+            
             // Show loading state
             if (coursesContainer) {
                 coursesContainer.innerHTML = `
@@ -927,17 +877,94 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
             }
 
-            // Fetch categories and courses from Firebase Realtime Database
-            const [categoriesSnapshot, coursesSnapshot] = await Promise.all([
-                firebaseServices.getCategories(),
-                firebaseServices.getCourses()
-            ]);
+            // Wait for Firebase services to be properly initialized
+            console.log('Waiting for Firebase services to be ready...');
+            let firebaseCheckAttempts = 0;
+            const maxFirebaseCheckAttempts = 20; // Maximum attempts before giving up
+            
+            while ((!window.firebaseServices || !window.firebaseServices.rtdb || !window.firebaseServicesInitialized) && firebaseCheckAttempts < maxFirebaseCheckAttempts) {
+                firebaseCheckAttempts++;
+                console.log(`Firebase services not ready yet. Attempt ${firebaseCheckAttempts}/${maxFirebaseCheckAttempts}`);
+                await new Promise(resolve => setTimeout(resolve, 500)); // Wait 500ms between checks
+            }
+            
+            // Check if Firebase services are properly initialized
+            if (!window.firebaseServices || !window.firebaseServices.rtdb) {
+                throw new Error('Firebase services not properly initialized after waiting');
+            }
 
-            const categories = categoriesSnapshot;
-            const courses = coursesSnapshot;
+            console.log('Firebase services available:', !!window.firebaseServices.rtdb);
+            
+            // Test Firebase connection
+            try {
+                console.log('Testing Firebase connection...');
+                const connectionTest = await window.firebaseServices.testConnection();
+                console.log('Firebase connection test result:', connectionTest);
+                
+                if (!connectionTest) {
+                    console.warn('Firebase connection test failed');
+                }
+                
+                // Validate database structure
+                console.log('Validating database structure...');
+                await window.firebaseServices.validateDatabaseStructure();
+            } catch (connectionError) {
+                console.error('Error during Firebase connection test:', connectionError);
+            }
+            
+            // Fetch categories and courses from Firebase Realtime Database
+            console.log('Fetching categories and courses from Firebase...');
+            let categories, courses;
+            
+            try {
+                const [categoriesSnapshot, coursesSnapshot] = await Promise.all([
+                    firebaseServices.getCategories(),
+                    firebaseServices.getCourses()
+                ]);
+
+                categories = categoriesSnapshot;
+                courses = coursesSnapshot;
+                
+                console.log('Successfully fetched data from Firebase');
+            } catch (fetchError) {
+                console.error('Error fetching data from Firebase:', fetchError);
+                
+                // Show specific error based on the type of error
+                if (fetchError.code === 'PERMISSION_DENIED') {
+                    console.error('Firebase permission denied. Check security rules.');
+                } else if (fetchError.code === 'NETWORK_ERROR') {
+                    console.error('Network error. Check internet connection.');
+                } else if (fetchError.message.includes('database')) {
+                    console.error('Database connection error. Check database URL.');
+                }
+                
+                throw fetchError;
+            }
 
             console.log('Categories data from Firebase:', categories);
             console.log('Courses data from Firebase:', courses);
+            
+            // Handle case where no data is returned
+            if (!categories) {
+                console.warn('No categories data received from Firebase');
+                categories = [];
+            }
+            
+            if (!courses) {
+                console.warn('No courses data received from Firebase');
+                courses = [];
+            }
+            
+            // Handle case where empty data is returned
+            if (categories && !Array.isArray(categories)) {
+                console.warn('Categories data is not an array, converting to array');
+                categories = [];
+            }
+            
+            if (courses && !Array.isArray(courses)) {
+                console.warn('Courses data is not an array, converting to array');
+                courses = [];
+            }
 
             // Create category ID to name mapping
             categoryMap = {};
@@ -946,10 +973,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Map both the ID and name for lookup
                     categoryMap[category.id] = category.name || category.id;
                 });
+            } else {
+                console.warn('No categories found or empty categories array');
+                // Provide default categories if none exist
+                categories = [
+                    { id: 'web-development', name: 'Web Development' },
+                    { id: 'data-science', name: 'Data Science' },
+                    { id: 'mobile-apps', name: 'Mobile Apps' },
+                    { id: 'design', name: 'Design' }
+                ];
+                
+                // Create mapping for default categories
+                categories.forEach(category => {
+                    categoryMap[category.id] = category.name;
+                });
             }
 
             // Store all courses for filtering
-            allCourses = courses;
+            allCourses = courses || [];
 
             // Check if user is logged in to load their bookmarks and completed courses
             const user = firebaseServices.auth.currentUser;
@@ -980,8 +1021,34 @@ document.addEventListener('DOMContentLoaded', function() {
             // Render difficulty filters
             renderDifficultyFilters();
 
+            // Handle case when no courses are available
+            if ((!courses || courses.length === 0) && allCourses.length === 0) {
+                console.warn('No courses available, showing empty state');
+                // Provide sample courses if none exist in database
+                courses = [
+                    {
+                        id: 'sample-1',
+                        title: 'Getting Started with Online Learning',
+                        description: 'Learn how to make the most of your online learning experience.',
+                        category: 'web-development',
+                        difficulty: 'Beginner',
+                        duration: '2 hours',
+                        rating: 4.5,
+                        enrollmentCount: 0,
+                        instructor: 'BYAMN Team',
+                        thumbnail: 'https://placehold.co/400x200/6366f1/white?text=Getting+Started',
+                        lessons: [
+                            { id: 'lesson-1', title: 'Introduction to Online Learning', duration: 30 },
+                            { id: 'lesson-2', title: 'Setting Up Your Learning Environment', duration: 45 }
+                        ],
+                        createdAt: new Date().toISOString()
+                    }
+                ];
+                allCourses = courses;
+            }
+            
             // Render all courses by default
-            renderCourses(courses);
+            renderCourses(courses || []);
 
             // Set the "All Courses" button as active
             const allCoursesButton = document.querySelector('.filter-btn[data-category="all"]');
@@ -989,26 +1056,41 @@ document.addEventListener('DOMContentLoaded', function() {
                 allCoursesButton.classList.add('active');
             }
             
-            // Update bookmarks filter button count
-            if (bookmarksFilterBtn) {
-                const bookmarkCount = bookmarkedCourses.size;
-                bookmarksFilterBtn.innerHTML = `
-                    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                    </svg>
-                    My Bookmarks${bookmarkCount > 0 ? ` (${bookmarkCount})` : ''}
-                `;
-            }
+
             
             // Update results count
+            const courseCount = courses ? courses.length : 0;
             if (resultsCount) {
-                resultsCount.textContent = `${courses.length} course${courses.length !== 1 ? 's' : ''} found`;
+                resultsCount.textContent = `${courseCount} course${courseCount !== 1 ? 's' : ''} found`;
             }
+            
+            console.log('Finished loading categories and courses successfully');
         } catch (error) {
             console.error('Error loading categories and courses:', error);
-            utils.showNotification('Error loading data: ' + error.message, 'error');
+            console.error('Error details:', {
+                message: error.message,
+                code: error.code,
+                name: error.name,
+                stack: error.stack
+            });
+            
+            // Show user-friendly error message
+            let errorMessage = 'Error loading data: ' + error.message;
+            
+            // Provide more specific error messages based on error type
+            if (error.code === 'PERMISSION_DENIED') {
+                errorMessage = 'Access denied. Please check if you have permission to access the course data.';
+            } else if (error.code === 'NETWORK_ERROR' || error.message.includes('network')) {
+                errorMessage = 'Network error. Please check your internet connection and try again.';
+            } else if (error.message.includes('database') || error.message.includes('Database')) {
+                errorMessage = 'Database connection error. The course data may be temporarily unavailable.';
+            } else if (error.message.includes('timeout') || error.message.includes('Timeout')) {
+                errorMessage = 'Request timeout. The server may be busy. Please try again later.';
+            }
+            
+            utils.showNotification(errorMessage, 'error');
 
-            // Show error state
+            // Show error state with option to load sample data
             if (coursesContainer) {
                 coursesContainer.innerHTML = `
                     <div class="col-span-full text-center py-20">
@@ -1017,9 +1099,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         </svg>
                         <h3 class="mt-6 text-2xl font-bold text-gray-900">Error Loading Data</h3>
                         <p class="mt-3 text-gray-600 max-w-md mx-auto">There was an error loading courses. Please try again later.</p>
-                        <div class="mt-8">
+                        <div class="mt-4 text-sm text-gray-500 mb-4">
+                            <p>Error: ${errorMessage}</p>
+                        </div>
+                        <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
                             <button onclick="location.reload()" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition duration-300 shadow-md hover:shadow-lg">
                                 Retry
+                            </button>
+                            <button onclick="loadSampleData()" class="px-6 py-3 rounded-xl bg-gray-600 hover:bg-gray-700 text-white font-semibold transition duration-300 shadow-md hover:shadow-lg">
+                                Load Sample Data
                             </button>
                         </div>
                     </div>
@@ -1448,16 +1536,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     instructorFilter = 'all';
                     currentSort = 'newest';
                     
-                    // Reset bookmarks filter
-                    if (bookmarksFilterBtn) {
-                        bookmarksFilterBtn.classList.remove('active');
-                        bookmarksFilterBtn.innerHTML = `
-                            <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                            </svg>
-                            My Bookmarks${bookmarkedCourses.size > 0 ? ` (${bookmarkedCourses.size})` : ''}
-                        `;
-                    }
+                    
                     
                     // Reset UI elements
                     if (searchInput) searchInput.value = '';

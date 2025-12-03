@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Load Demo Data</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .log {
+            background-color: #000;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+        .success {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .error {
+            color: #f44336;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Load Demo Data to Firebase</h1>
+    
+    <div class="container">
+        <h2>Firebase Configuration</h2>
+        <p>This tool will load the demo data from firebase_data_demo.json into your Firebase Realtime Database.</p>
+        <button id="loadDataBtn">Load Demo Data</button>
+    </div>
+    
+    <div class="log" id="logOutput"></div>
+    
+    <script>
+        // Firebase configuration from your existing code
+        const firebaseConfig = {
+            apiKey: "AIzaSyCDlU6SzJK4acxccwoU1MGAZuOa1Na2qTw",
+            authDomain: "byamn-learning.firebaseapp.com",
+            databaseURL: "https://byamn-learning-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "byamn-learning",
+            storageBucket: "byamn-learning.firebasestorage.app",
+            messagingSenderId: "392701533119",
+            appId: "1:392701533119:web:a40ce8bba6b79617af1f0a",
+            measurementId: "G-6S5EK0S9RS"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        const logOutput = document.getElementById('logOutput');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toISOString();
+            const logEntry = document.createElement('div');
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logEntry.className = type;
+            logOutput.appendChild(logEntry);
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+        
+        async function loadDemoData() {
+            try {
+                log('Starting to load demo data...', 'info');
+                
+                // Fetch the demo data
+                log('Fetching demo data from firebase_data_demo.json...', 'info');
+                const response = await fetch('./firebase_data_demo.json');
+                const demoData = await response.json();
+                log('Demo data fetched successfully', 'success');
+                
+                // Load categories
+                log('Loading categories...', 'info');
+                const categoriesRef = database.ref('categories');
+                await categoriesRef.set(demoData.categories);
+                log(`Categories loaded: ${Object.keys(demoData.categories).length} categories`, 'success');
+                
+                // Load courses
+                log('Loading courses...', 'info');
+                const coursesRef = database.ref('courses');
+                await coursesRef.set(demoData.courses);
+                log(`Courses loaded: ${Object.keys(demoData.courses).length} courses`, 'success');
+                
+                // Load users (if any)
+                if (demoData.users) {
+                    log('Loading users...', 'info');
+                    const usersRef = database.ref('users');
+                    await usersRef.set(demoData.users);
+                    log(`Users loaded: ${Object.keys(demoData.users).length} users`, 'success');
+                }
+                
+                log('All demo data loaded successfully!', 'success');
+                log('You can now view the homepage with real course data.', 'success');
+                
+            } catch (error) {
+                log(`Error loading demo data: ${error.message}`, 'error');
+                console.error('Error details:', error);
+            }
+        }
+        
+        document.getElementById('loadDataBtn').addEventListener('click', loadDemoData);
+    </script>
+</body>
+</html>
