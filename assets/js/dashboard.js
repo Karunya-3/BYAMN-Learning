@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             alt="${course.title}" 
                             class="w-full h-full object-cover"
                             loading="lazy"
-                            onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHg9IjMiIHk9IjQiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxMyIgcng9IjIiLz48cG9seWxpbmUgcG9pbnRzPSIxIDIwIDggMTMgMTMgMTgiLz48cG9seWxpbmUgcG9pbnRzPSIyMSAyMCAxNi41IDE1LjUgMTQgMTgiLz48bGluZSB4MT0iOSIgeDI9IjkiIHkxPSI5IiB5Mj0iOSIvPjwvc3ZnPg==';"
+                            onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHg9IjMiIHk9IjQiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxMyIgcng9IjIiLz48cG9seWxpbmUgcG9pbnRzPSIxIDIwIDggMTMgMTMgMTgiLz48cG9seWxpbmUgcG9pbnRzPSIyMSAyMCAxNi41IDE1LjUgMTQgMTgiLz48bGluZSB4MT0iOSIgeGI9IjkiIHkxPSI5IiB5Mj0iOSIvPjwvc3ZnPg==';"
                         >
                     </div>
                     
@@ -861,7 +861,7 @@ document.addEventListener('DOMContentLoaded', function() {
         achievementsContainer.innerHTML = achievementsHTML;
     }
 
-        // Initialize learning path visualization if container exists
+    // Initialize learning path visualization if container exists
     if (document.getElementById('learning-patterns-container')) {
         // Load the learning path visualizer script
         const script = document.createElement('script');
@@ -1899,4 +1899,78 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
         });
     }
+    
+    /**
+     * Print detailed dashboard analytics
+     */
+    async function printDetailedDashboard() {
+        try {
+            const user = firebaseServices.auth.currentUser;
+            if (!user) {
+                utils.showNotification('Please sign in to print dashboard', 'error');
+                return;
+            }
+
+            // Get user data
+            const userData = {
+                displayName: user.displayName,
+                email: user.email,
+                uid: user.uid
+            };
+
+            // Get analytics data
+            const analytics = await firebaseServices.getUserAnalytics(user.uid);
+            if (!analytics) {
+                utils.showNotification('No analytics data available', 'error');
+                return;
+            }
+
+            // Initialize print utils if not already done
+            if (!window.printUtils && typeof PrintUtils !== 'undefined') {
+                window.printUtils = new PrintUtils();
+            }
+
+            if (window.printUtils) {
+                window.printUtils.printDashboardSummary(userData, analytics);
+            } else {
+                console.warn('PrintUtils not available');
+                utils.showNotification('Print feature not available', 'error');
+            }
+            
+        } catch (error) {
+            console.error('Error printing dashboard:', error);
+            utils.showNotification('Error printing dashboard: ' + error.message, 'error');
+        }
+    }
+
+    // Add print dashboard button
+    setTimeout(() => {
+        const achievementsContainer = document.getElementById('achievements-container');
+        if (achievementsContainer) {
+            const dashboardSection = achievementsContainer.closest('.bg-white') || 
+                                     document.querySelector('main') || 
+                                     document.getElementById('dashboard-content');
+            
+            if (dashboardSection) {
+                const printBtn = document.createElement('button');
+                printBtn.className = 'mt-8 px-6 py-3 rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium transition duration-300 shadow-md hover:shadow-lg flex items-center justify-center mx-auto';
+                printBtn.innerHTML = `
+                    <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Print Learning Report
+                `;
+                printBtn.onclick = printDetailedDashboard;
+                printBtn.id = 'print-dashboard-btn';
+                
+                // Insert after the achievements section or at the end of the dashboard
+                const achievementsSection = achievementsContainer.closest('section');
+                if (achievementsSection) {
+                    achievementsSection.insertAdjacentElement('afterend', printBtn);
+                } else {
+                    dashboardSection.appendChild(printBtn);
+                }
+            }
+        }
+    }, 2000); // Wait for dashboard to load
 });

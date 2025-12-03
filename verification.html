@@ -80,11 +80,48 @@
             25% { transform: translateX(-5px); }
             75% { transform: translateX(5px); }
         }
+
+        /* Print styles */
+        @media print {
+            body { 
+                font-family: Arial, sans-serif; 
+                padding: 20px;
+                background: white !important;
+            }
+            h1 { color: #000 !important; }
+            .bg-green-50 { background: #f0f9f0 !important; }
+            .bg-red-50 { background: #fee !important; }
+            .bg-blue-50 { background: #eff6ff !important; }
+            .no-print { display: none !important; }
+        }
+
+        /* Button styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #5624d0;
+            color: #5624d0;
+        }
+
+        .btn-outline:hover {
+            background: #5624d0;
+            color: white;
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
     <!-- Header -->
-    <header data-aos-duration="800" class="bg-white shadow-sm sticky top-0 z-10">
+    <header data-aos-duration="800" class="bg-white shadow-sm sticky top-0 z-10 no-print">
         <div data-aos="fade-down" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 gap-4">
                 <div class="flex items-center">
@@ -127,7 +164,7 @@
         </div>
 
         <!-- Security Notice -->
-        <div class="max-w-2xl mx-auto bg-blue-50/20 border border-blue-200 rounded-xl p-5 mb-8 fade-in">
+        <div class="max-w-2xl mx-auto bg-blue-50/20 border border-blue-200 rounded-xl p-5 mb-8 fade-in no-print">
             <div class="flex">
                 <svg class="h-6 w-6 text-blue-500 mt-0.5 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -142,7 +179,7 @@
         </div>
 
         <!-- Example Certificates -->
-        <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-md p-6 mb-8 verification-card fade-in">
+        <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-md p-6 mb-8 verification-card fade-in no-print">
             <h2 class="text-xl font-bold text-gray-900 mb-4">How to Verify</h2>
             <p class="text-gray-600 mb-4">Enter your certificate UID below. Certificate UIDs follow the format: <code class="bg-gray-100 px-2 py-1 rounded">CERT-BYAMN-XXXXX</code></p>
 
@@ -179,7 +216,7 @@
         </div>
 
         <!-- Verification Form -->
-        <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-md overflow-hidden mb-8 verification-card fade-in">
+        <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-md overflow-hidden mb-8 verification-card fade-in no-print">
             <div class="p-6">
                 <h2 class="text-2xl font-bold text-gray-900 mb-2">Verify Certificate</h2>
                 <p class="text-gray-600 mb-6">Enter the certificate UID to verify its authenticity</p>
@@ -210,12 +247,15 @@
                 <div id="result-content">
                     <!-- Result will be displayed here -->
                 </div>
+                
+                <!-- Print button will be added here dynamically -->
+                <div id="print-button-container" class="mt-6 no-print"></div>
             </div>
         </div>
     </main>
 
     <!-- Footer -->
-    <footer data-aos-duration="1000" class="bg-neutral-900 text-white mt-24 fade-in">
+    <footer data-aos-duration="1000" class="bg-neutral-900 text-white mt-24 fade-in no-print">
         <div data-aos="fade-up" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div class="col-span-1 md:col-span-2">
@@ -285,9 +325,129 @@
     </footer>
 
     <script>
-        AOS.init({
-            duration: 1200, // optional: animation duration in ms
-            once: true      // optional: run animation only once
+        // AOS initialization
+        if (typeof AOS !== 'undefined') {
+            AOS.init({
+                duration: 1200,
+                once: true
+            });
+        }
+
+        // Print verification result function
+        function printVerificationResult() {
+            const resultContent = document.getElementById('result-content');
+            if (!resultContent || resultContent.innerHTML.trim() === '') {
+                alert('No verification result to print');
+                return;
+            }
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>BYAMN Certificate Verification</title>
+                    <style>
+                        @media print {
+                            body { 
+                                font-family: Arial, sans-serif; 
+                                padding: 20px; 
+                                background: white !important;
+                            }
+                            h1 { color: #000 !important; }
+                            .bg-green-50 { background: #f0f9f0 !important; }
+                            .bg-red-50 { background: #fee !important; }
+                            .bg-blue-50 { background: #eff6ff !important; }
+                        }
+                        body { 
+                            font-family: Arial, sans-serif; 
+                            padding: 20px; 
+                            max-width: 800px;
+                            margin: 0 auto;
+                        }
+                        h1 { 
+                            color: #000; 
+                            text-align: center;
+                            margin-bottom: 30px;
+                            border-bottom: 2px solid #5624d0;
+                            padding-bottom: 10px;
+                        }
+                        .result-container {
+                            border: 1px solid #ddd;
+                            border-radius: 8px;
+                            padding: 20px;
+                            margin-bottom: 20px;
+                        }
+                        .success { background-color: #f0f9f0; }
+                        .error { background-color: #fee; }
+                        .info { background-color: #eff6ff; }
+                        .verification-date {
+                            text-align: right;
+                            color: #666;
+                            font-size: 0.9em;
+                            margin-top: 30px;
+                            border-top: 1px solid #ddd;
+                            padding-top: 10px;
+                        }
+                        .byamn-logo {
+                            text-align: center;
+                            margin-bottom: 20px;
+                            font-weight: bold;
+                            font-size: 1.5em;
+                            color: #5624d0;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="byamn-logo">BYAMN Certificate Verification</div>
+                    <h1>Certificate Verification Result</h1>
+                    <div class="result-container ${resultContent.className.includes('bg-green-50') ? 'success' : resultContent.className.includes('bg-red-50') ? 'error' : 'info'}">
+                        ${resultContent.innerHTML}
+                    </div>
+                    <div class="verification-date">
+                        Verified on: ${new Date().toLocaleString()}<br>
+                        Official BYAMN Verification System
+                    </div>
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                            setTimeout(() => {
+                                if (confirm('Print completed. Close this window?')) {
+                                    window.close();
+                                }
+                            }, 500);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        // Add print button dynamically when verification result is shown
+        document.addEventListener('DOMContentLoaded', function() {
+            // This will be called from verification.js when result is displayed
+            window.addPrintButton = function() {
+                const verificationResult = document.getElementById('verification-result');
+                const printButtonContainer = document.getElementById('print-button-container');
+                
+                if (verificationResult && printButtonContainer && verificationResult.style.display !== 'none') {
+                    // Clear any existing button
+                    printButtonContainer.innerHTML = '';
+                    
+                    // Create print button
+                    const printBtn = document.createElement('button');
+                    printBtn.className = 'btn btn-outline mt-4 flex items-center';
+                    printBtn.innerHTML = `
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        </svg>
+                        Print Verification Result
+                    `;
+                    printBtn.onclick = printVerificationResult;
+                    printButtonContainer.appendChild(printBtn);
+                }
+            };
         });
     </script>
 
