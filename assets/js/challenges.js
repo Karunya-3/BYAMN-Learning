@@ -61,19 +61,7 @@ class LearningChallenges {
                 expires: this.getNextMonthDate(),
                 category: 'community'
             },
-            {
-                id: 'weekly_explorer',
-                title: 'Course Explorer',
-                description: 'Enroll in 3 new courses this week',
-                type: 'weekly',
-                goal: 3,
-                unit: 'courses',
-                reward: '🧭 Explorer Badge',
-                icon: '🧭',
-                progress: 0,
-                expires: this.getNextWeekDate(),
-                category: 'exploration'
-            }
+
         ];
 
         this.loadUserProgress();
@@ -173,8 +161,7 @@ class LearningChallenges {
             'weekly_lesson_streak': ['lesson_complete', 'daily_streak'],
             'weekly_course_completion': ['course_complete'],
             'weekly_study_time': ['study_time'],
-            'monthly_community': ['certificate_share', 'achievement_share'],
-            'weekly_explorer': ['course_enroll']
+            'monthly_community': ['certificate_share', 'achievement_share']
         };
 
         return activityMap[challenge.id]?.includes(activityType);

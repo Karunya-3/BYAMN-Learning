@@ -1,0 +1,537 @@
+{
+  "categories": {
+    "category-1760090630498": {
+      "courseCount": 2,
+      "createdAt": "2025-10-10T16:40:15.328Z",
+      "description": "",
+      "id": "category-1760090630498",
+      "name": "Android Development",
+      "updatedAt": "2025-10-10T16:40:15.328Z"
+    },
+    "category-1760113579286": {
+      "courseCount": 5,
+      "createdAt": "2025-10-10T16:26:19.287Z",
+      "description": "",
+      "id": "category-1760113579286",
+      "name": "Web Developmnet",
+      "updatedAt": "2025-10-10T16:26:19.287Z"
+    },
+    "category-1760114385607": {
+      "courseCount": 0,
+      "createdAt": "2025-10-10T16:39:45.607Z",
+      "description": "",
+      "id": "category-1760114385607",
+      "name": "business",
+      "updatedAt": "2025-10-10T16:39:45.607Z"
+    },
+    "category-1760166880946": {
+      "courseCount": 5,
+      "createdAt": "2025-10-11T07:14:40.947Z",
+      "description": "",
+      "id": "category-1760166880946",
+      "name": "Programming",
+      "updatedAt": "2025-10-11T07:14:40.947Z"
+    },
+    "category-1760601911114": {
+      "courseCount": 1,
+      "createdAt": "2025-10-16T08:05:11.115Z",
+      "description": "",
+      "id": "category-1760601911114",
+      "name": "AI/ML",
+      "updatedAt": "2025-10-16T08:05:11.115Z"
+    },
+    "category-1760621608366": {
+      "courseCount": 0,
+      "createdAt": "2025-10-16T13:33:28.367Z",
+      "description": "",
+      "id": "category-1760621608366",
+      "name": "Medical & Healthcare",
+      "updatedAt": "2025-10-16T13:33:28.367Z"
+    },
+    "category-1764590519005": {
+      "courseCount": 1,
+      "createdAt": "2025-12-01T12:01:59.006Z",
+      "description": "",
+      "id": "category-1764590519005",
+      "name": "Web3 / Blockchain",
+      "updatedAt": "2025-12-01T12:01:59.006Z"
+    }
+  },
+  "courses": {
+    "course-1760164909920": {
+      "category": "category-1760090630498",
+      "createdAt": "2025-10-11T06:46:41.073Z",
+      "description": "In just 2 days, I developed a fully functional app for Newton School of Technology! 🚀",
+      "instructor": "DYHARD",
+      "language": "Hindi",
+      "lessons": [
+        {
+          "description": "In just 2 days, I developed a fully functional app for Newton School of Technology! 🚀 This video is all about my journey, challenges, and how I made it possible in such a short time. If you're into app development, coding, or software engineering, this video will give you insights into fast-paced development and problem-solving.\n\n🔥 What you’ll learn in this video:\n✅ My thought process behind building the app\n✅ Tech stack and tools I used (Java, Firebase, Sketchware, etc.)\n✅ Challenges I faced and how I overcame them\n✅ How to build apps efficiently in less time",
+          "duration": 240,
+          "id": "lesson-1760165060680",
+          "minWatchTime": 3,
+          "order": 1,
+          "title": "I Built an App in Just 2 Days for Newton School of Technology 🌋",
+          "videoId": "v4muiEhuKe4"
+        }
+      ],
+      "level": "beginner",
+      "thumbnail": "https://i.ibb.co/S4ZsHLFS/hqdefault.jpg",
+      "title": "I Built an App in Just 2 Days",
+      "updatedAt": "2025-10-11T06:46:41.073Z"
+    },
+    "course-1760165316104": {
+      "category": "category-1760113579286",
+      "createdAt": "2025-10-11T06:48:36.105Z",
+      "description": "This is the ReactJS Full Course | Learn Everything from Scratch to Advanced, your complete guide to mastering React in one video.",
+      "instructor": "Sheryians Coding School",
+      "language": "Hindi",
+      "lessons": [
+        {
+          "description": "We’ll start with the basics like components, JSX, props, and state, then move to advanced topics like hooks, context API, routing, and real project setups. By the end, you’ll understand how React really works and how to build production-ready apps confidently.\n\n📘 What’s Inside:\n\nReact fundamentals (JSX, Props, State)\nHooks and Context API\nRouting and API Integration\nFolder structure and best practices\nReal-world project demo\n\n💻 Source Code:\nAccess the complete source code of this video here → https://github.com/saarthack/react-yt",
+          "duration": 675,
+          "id": "lesson-1760165410823",
+          "minWatchTime": 60,
+          "order": 1,
+          "title": "ReactJS - Learn Everything | Sheryians Coding School",
+          "videoId": "3LRZRSIh_KE"
+        }
+      ],
+      "level": "intermediate",
+      "thumbnail": "https://i.ibb.co/cKBXQFMG/maxresdefault.jpg",
+      "title": "ReactJS Full Course",
+      "updatedAt": "2025-10-11T06:48:36.105Z"
+    },
+    "course-1760165792176": {
+      "category": "category-1760113579286",
+      "createdAt": "2025-10-11T06:56:32.177Z",
+      "description": "Everything from SQL basics to advanced queries—SELECT, INSERT, UPDATE, DELETE, joins, subqueries, views, indexing, stored procedures, triggers, and data types",
+      "instructor": "Code with Technyks",
+      "language": "Hindi",
+      "lessons": [
+        {
+          "description": "Learn complete SQL in one video—covering both MySQL and PostgreSQL, in Hindi! This 12-hour course takes you from absolute basics to advanced topics, teaching databases, tables, keys, CRUD operations, joins, views, subqueries, functions, indexing, interview tips, and much more.\n\nWho is this course for?\n\nBeginners, students, data analysts, web developers, programmers, and IT professionals\nPerfect for those preparing for job interviews or working on real-world projects!\n\nWhat will you learn?\n\nEverything from SQL basics to advanced queries—SELECT, INSERT, UPDATE, DELETE, joins, subqueries, views, indexing, stored procedures, triggers, and data types\n\nReal-world projects and practice in MySQL & PostgreSQL!\n",
+          "duration": 40860,
+          "id": "lesson-1760166492812",
+          "minWatchTime": 100,
+          "order": 1,
+          "title": "SQL Complete Course in Hindi (MySQL + PostgreSQL) ",
+          "videoId": "blkZ6APzT8Q"
+        }
+      ],
+      "level": "beginner",
+      "thumbnail": "https://i.ibb.co/pBjgrgd2/maxresdefault.jpg",
+      "title": "SQL Full Tutorial in 1 Video",
+      "updatedAt": "2025-10-11T06:56:32.177Z"
+    },
+    "course-1760166665740": {
+      "category": "category-1760166880946",
+      "createdAt": "2025-10-11T07:14:56.819Z",
+      "description": "🚀 Learn all key Data Structures and Algorithms concepts with practical coding examples and logic building techniques. Perfect for college students and beginners preparing for placements or coding interviews.",
+      "instructor": "College Wallah",
+      "language": "Hindi",
+      "lessons": [
+        {
+          "description": "Master DSA in C++ in just one shot! 🚀 Learn all key Data Structures and Algorithms concepts with practical coding examples and logic building techniques. Perfect for college students and beginners preparing for placements or coding interviews.",
+          "duration": 653,
+          "id": "lesson-1760166764899",
+          "minWatchTime": 120,
+          "order": 1,
+          "title": "Complete Data Structures and Algorithms for Beginners to Advance",
+          "videoId": "GRxzQXBwA-U"
+        }
+      ],
+      "level": "intermediate",
+      "thumbnail": "https://i.ibb.co/cSYzvrHt/maxresdefault.jpg",
+      "title": "DSA in C++ in One Shot",
+      "updatedAt": "2025-10-11T07:14:56.819Z"
+    },
+    "course-1760167077818": {
+      "category": "category-1760113579286",
+      "createdAt": "2025-10-11T07:17:57.819Z",
+      "description": "The Best Beginners CSS Full Course",
+      "instructor": "Future Fullstack",
+      "language": "English",
+      "lessons": [
+        {
+          "description": " ",
+          "duration": 675,
+          "id": "lesson-1760167173978",
+          "minWatchTime": 120,
+          "order": 1,
+          "title": "Learn EVERYTHING You Need to Know in Detail 🔍",
+          "videoId": "-G-zic_LS0A"
+        }
+      ],
+      "level": "beginner",
+      "thumbnail": "https://i.ibb.co/kVZH1jD1/maxresdefault.jpg",
+      "title": "CSS Full Course Tutorial for Beginners",
+      "updatedAt": "2025-10-11T07:17:57.819Z"
+    },
+    "course-1760167411361": {
+      "category": "category-1760166880946",
+      "createdAt": "2025-10-11T07:23:31.362Z",
+      "description": "Complete Git and GitHub Tutorial for Beginners",
+      "instructor": "Apna College",
+      "language": "Hindi",
+      "lessons": [
+        {
+          "description": "",
+          "duration": 74,
+          "id": "lesson-1760167459272",
+          "minWatchTime": 20,
+          "order": 1,
+          "title": " Complete Git and GitHub Tutorial for Beginners",
+          "videoId": "Ez8F0nW6S-w"
+        }
+      ],
+      "level": "beginner",
+      "thumbnail": "https://i.ibb.co/9mfJ68nK/maxresdefault.jpg",
+      "title": "Git and GitHub",
+      "updatedAt": "2025-10-11T07:23:31.362Z"
+    },
+    "course-1760167619512": {
+      "category": "category-1760166880946",
+      "createdAt": "2025-10-11T07:26:59.513Z",
+      "description": "ou’ll learn why open source is super important for every developer. ✅ We’ll explain how it can help you learn faster, build real projects, and get better job opportunities. This crash course will show you how to start your open source journey easily.",
+      "instructor": "Saumya Singh",
+      "language": "Hindi",
+      "lessons": [
+        {
+          "description": "you’ll learn why open source is super important for every developer. ✅ We’ll explain how it can help you learn faster, build real projects, and get better job opportunities. This crash course will show you how to start your open source journey easily.\n\n🧑‍💻 Assignment: https://github.com/saumya1singh/Assignment \n🔥 Notes:  https://bit.ly/4k537DJ\n📓 Cheat sheet: https://bit.ly/4jw9Dm1\n",
+          "duration": 55,
+          "id": "lesson-1760167689608",
+          "minWatchTime": 10,
+          "order": 1,
+          "title": " How to Contribute to Open Source",
+          "videoId": "2do4WZ0e8UU"
+        }
+      ],
+      "level": "beginner",
+      "thumbnail": "https://i.ibb.co/hRNCbhDH/maxresdefault.jpg",
+      "title": "Open Source Crash Course",
+      "updatedAt": "2025-10-11T07:26:59.513Z"
+    },
+    "course-1760167900608": {
+      "category": "category-1760166880946",
+      "createdAt": "2025-10-11T07:31:40.609Z",
+      "description": "",
+      "instructor": "Piyush Garg",
+      "language": "Hindi",
+      "lessons": [
+        {
+          "description": "Piyush Garg's Repository Link: https://github.com/piyushgarg-dev/piyushgargdev-nextjs",
+          "duration": 77,
+          "id": "lesson-1760167997703",
+          "minWatchTime": 10,
+          "order": 1,
+          "title": " Day 1: Open Source Contributions | BootCamp",
+          "videoId": "tlJVWvzOnlw"
+        },
+        {
+          "description": "Piyush Garg's Repository Link: https://github.com/piyushgarg-dev/piyushgargdev-nextjs",
+          "duration": 93,
+          "id": "lesson-1760168050407",
+          "minWatchTime": 2,
+          "order": 2,
+          "title": " Day 2: Git Branches and Pull Requests ",
+          "videoId": "mMl_Eegy3bQ"
+        },
+        {
+          "description": "Piyush Garg's Repository Link: https://github.com/piyushgarg-dev/piyushgargdev-nextjs",
+          "duration": 20,
+          "id": "lesson-1760168087830",
+          "minWatchTime": 2,
+          "order": 3,
+          "title": " Day 3: Advance Git and Open Source Contribution",
+          "videoId": "VgbECciztVs"
+        },
+        {
+          "description": "Piyush Garg's Repository Link: https://github.com/piyushgarg-dev/piyushgargdev-nextjs",
+          "duration": 58,
+          "id": "lesson-1760168134190",
+          "minWatchTime": 10,
+          "order": 4,
+          "title": "Day 3: Advance Git and Open Source Contribution - Continued",
+          "videoId": "mn8yyOpjK3c"
+        },
+        {
+          "description": "Piyush Garg's Repository Link: https://github.com/piyushgarg-dev/piyushgargdev-nextjs",
+          "duration": 60,
+          "id": "lesson-1760168189894",
+          "minWatchTime": 5,
+          "order": 5,
+          "title": "Day 4: Git Merge Conflicts | Doubt Solving",
+          "videoId": "oKVkOYIXyDE"
+        },
+        {
+          "description": "Piyush Garg's Repository Link: https://github.com/piyushgarg-dev/piyushgargdev-nextjs",
+          "duration": 25,
+          "id": "lesson-1760168224430",
+          "minWatchTime": 2,
+          "order": 6,
+          "title": " How to Resolve Merge Conflicts in Git",
+          "videoId": "l03tGz4pXoQ"
+        },
+        {
+          "description": "Piyush Garg's Repository Link: https://github.com/piyushgarg-dev/piyushgargdev-nextjs",
+          "duration": 80,
+          "id": "lesson-1760168257886",
+          "minWatchTime": 20,
+          "order": 7,
+          "title": " Day 5: Open Source Contribution Bootcamp",
+          "videoId": "py0M8510ajM"
+        }
+      ],
+      "level": "beginner",
+      "thumbnail": "https://i.ibb.co/vCFtRNjm/maxresdefault.jpg",
+      "title": "Open Source BootCamp",
+      "updatedAt": "2025-10-11T07:31:40.609Z"
+    },
+    "course-1760601895340": {
+      "category": "category-1760601911114",
+      "createdAt": "2025-10-16T08:05:20.797Z",
+      "description": "Explore the fundamentals of Artificial Intelligence and Machine Learning, understand key algorithms, and gain practical skills to build intelligent, data-driven applications",
+      "instructor": "Apna College",
+      "language": "Hindi",
+      "lessons": [
+        {
+          "description": "\n<p style=\"color:#555;\">\nThis lesson introduces key Artificial Intelligence concepts and beginner-friendly Machine Learning algorithms, with practical examples to help you start building intelligent applications. Original creator video link: <a href=\"[insert-original-video-link]\" target=\"_blank\" style=\"color:#28a745;\">Watch here</a>.\n</p>\n",
+          "duration": 3960,
+          "id": "lesson-1760602085451",
+          "minWatchTime": 10,
+          "order": 1,
+          "title": "AI Complete OneShot Course for Beginners",
+          "videoId": "D1eL1EnxXXQ"
+        }
+      ],
+      "level": "beginner",
+      "thumbnail": "https://i.ibb.co/fGtMsMgL/maxresdefault.jpg",
+      "title": "Learn AI & ML Fundamentals from Scratch",
+      "updatedAt": "2025-10-16T08:05:20.797Z"
+    },
+    "course-1760619493935": {
+      "category": "category-1760113579286",
+      "createdAt": "2025-10-16T13:26:45.623Z",
+      "description": "Comprehensive Java course from fundamentals to advanced topics. Learn syntax, OOP, data structures, concurrency, and build real-world applications with hands-on projects.",
+      "instructor": "Complete Coding by Prashant Sir",
+      "language": "Hindi",
+      "lessons": [
+        {
+          "description": "\n<p style=\"color:#555; margin-top:0; font-size:15px;\">\nThis lesson continues Java learning with object-oriented programming, classes, methods, and intermediate concepts to enhance your Java skills.\n</p>\n<p style=\"background:#fff3cd; padding:8px; border-left:5px solid #ffc107; color:#856404; font-weight:bold;\">\nOriginal Video: <a href=\"https://www.youtube.com/watch?v=nNLqygSI-rE\" target=\"_blank\">Watch Here</a>\n</p>\n<p style=\"margin-top:10px; color:#333;\">\nRepo: <a href=\"https://github.com/Complete-Coding/Java_Complete_Youtube\" target=\"_blank\" style=\"color:#28a745;\">Access Repository</a>\n</p>\n",
+          "duration": 43197,
+          "id": "lesson-1760620535239",
+          "minWatchTime": 100,
+          "order": 2,
+          "title": "JAVA Complete Course Part-2",
+          "videoId": "nNLqygSI-rE"
+        },
+        {
+          "description": "<p style=\"color:#555; margin-top:0; font-size:15px;\">\nThis lesson focuses on advanced Java topics such as inheritance, polymorphism, exception handling, and file operations to strengthen your programming skills.\n</p>\n<p style=\"background:#fff3cd; padding:8px; border-left:5px solid #ffc107; color:#856404; font-weight:bold;\">\nOriginal Video: <a href=\"https://www.youtube.com/watch?v=zMNBGVWGzmM\" target=\"_blank\">Watch Here</a>\n</p>\n<p style=\"margin-top:10px; color:#333;\">\nRepo: <a href=\"https://github.com/Complete-Coding/Java_Complete_Youtube\" target=\"_blank\" style=\"color:#28a745;\">Access Repository</a>\n</p>",
+          "duration": 41457,
+          "id": "lesson-1760620671039",
+          "minWatchTime": 100,
+          "order": 3,
+          "title": "Java Complete Course Part-3",
+          "videoId": "zMNBGVWGzmM"
+        },
+        {
+          "description": "<p style=\"color:#555; margin-top:0; font-size:15px;\">\nThis lesson covers the fundamentals of Java, including syntax, variables, data types, and basic programming concepts to get started with Java development.\n</p>\n<p style=\"background:#fff3cd; padding:8px; border-left:5px solid #ffc107; color:#856404; font-weight:bold;\">\nOriginal Video: <a href=\"[insert-original-video-link]\" target=\"_blank\">Watch Here</a>\n</p>\n<p style=\"margin-top:10px; color:#333;\">\nRepo: <a href=\"https://github.com/Complete-Coding/Java_Complete_Youtube\" target=\"_blank\" style=\"color:#28a745;\">Access Repository</a>\n</p>\n",
+          "duration": 43174,
+          "id": "lesson-1760621067751",
+          "minWatchTime": 100,
+          "order": 1,
+          "title": "JAVA Complete Course Part-1",
+          "videoId": "PymbRTMb4hY"
+        }
+      ],
+      "level": "beginner",
+      "thumbnail": "https://i.ibb.co/twsXzJMj/hqdefault.jpg",
+      "title": "Java Complete Basics to Advanced",
+      "updatedAt": "2025-10-16T13:26:45.623Z"
+    },
+    "course-1760620024775": {
+      "category": "category-1760113579286",
+      "createdAt": "2025-10-16T13:28:07.671Z",
+      "description": "Learn HTML from basics to advanced topics. Build semantic layouts, forms, responsive pages, and accessible markup with practical examples and hands-on projects.",
+      "instructor": "CodeWithHarry",
+      "language": "Hindi",
+      "lessons": [
+        {
+          "description": "\n<p style=\"color:#555; margin-top:0; font-size:15px;\">\nLearn HTML from basics to real projects. Build semantic pages, forms, and responsive layouts with hands-on examples.\n</p>\n\n<ul style=\"color:#333; line-height:1.6; padding-left:18px; margin-top:10px;\">\n  <li><strong>Download VS Code:</strong> <a href=\"https://code.visualstudio.com/download\" target=\"_blank\" style=\"color:#28a745;\">https://code.visualstudio.com/download</a></li>\n  <li><strong>Download the Handbook:</strong> <a href=\"https://www.codewithharry.com/notes/\" target=\"_blank\" style=\"color:#28a745;\">https://www.codewithharry.com/notes/</a> </li>\n  <li><strong>Source Code:</strong> <a href=\"https://github.com/CodeWithHarry/The-Ultimate-HTML-Course\" target=\"_blank\" style=\"color:#28a745;\">GitHub Repository</a></li>\n  <li><strong>5 HTML Projects Freelancing Bundle:</strong> <a href=\"https://cwh-full-next-space.fra1.cdn...\" target=\"_blank\" style=\"color:#28a745;\">Download Bundle</a></li>\n  <li><strong>Handwritten notes:</strong> <a href=\"https://www.codewithharry.com/notes/\" target=\"_blank\" style=\"color:#28a745;\">https://www.codewithharry.com/notes/</a></li>\n</ul>\n <p style=\"background:#fff3cd; padding:8px; border-left:5px solid #ffc107; color:#856404; font-weight:bold;\">\nOriginal Video: <a href=\"https://www.youtube.com/watch?v=k2DSi1zGEc8\" target=\"_blank\">Watch Here</a>\n</p>\n",
+          "duration": 9569,
+          "id": "lesson-1760621447894",
+          "minWatchTime": 20,
+          "order": 1,
+          "title": "HTML Full Course",
+          "videoId": "k2DSi1zGEc8"
+        }
+      ],
+      "level": "beginner",
+      "thumbnail": "https://i.ibb.co/NdYMH1tM/maxresdefault.jpg",
+      "title": "HTML Full Course",
+      "updatedAt": "2025-10-16T13:28:07.671Z"
+    },
+    "course-1764590301630": {
+      "category": "category-1764590519005",
+      "createdAt": "2025-12-01T12:02:13.103Z",
+      "description": "Learn the fundamentals of blockchain, how distributed systems work, the basics of smart contracts, and how to build real Web3 projects using modern tools and frameworks.",
+      "instructor": "web3Mantra",
+      "language": "Hindi",
+      "lessons": [
+        {
+          "description": "<h3 style=\"color:#007bff; margin-bottom:8px;\">Complete Blockchain Development Course for Beginners in Hindi</h3>\n\n<p style=\"color:#555; margin-top:0; font-size:15px;\">\nThis lesson covers blockchain basics, Ethereum fundamentals, Solidity programming, Hardhat workflow, deployment, and complete Web3 integration.\n</p>\n\n<!-- ORIGINAL VIDEO -->\n<p style=\"background:#fff3cd; padding:8px; border-left:5px solid #ffc107; color:#856404; font-weight:bold; margin-bottom:12px;\">\nOriginal Video: <a href=\"https://www.youtube.com/watch?v=RkYVVC2vXho\" target=\"_blank\">Watch Here</a>\n</p>\n\n<!-- DROPDOWN START -->\n<div style=\"margin-bottom:14px;\">\n\n  <button onclick=\"this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';\" \n          style=\"background:#28a745; color:white; padding:10px 14px; border:none; border-radius:6px; cursor:pointer; font-size:15px;\">\n    Show/Hide Chapters\n  </button>\n\n  <ul style=\"display:none; margin-top:12px; color:#333; line-height:1.6; padding-left:18px; border-left:3px solid #28a745;\">\n    <li>00:00:00 - Introduction</li>\n    <li>00:03:17 - Roadmap to blockchain development</li>\n    <li>00:16:15 - Ethereum Basics</li>\n    <li>00:26:18 - Overview to blockchain development</li>\n    <li>01:06:07 - Solidity Course Introduction</li>\n    <li>01:10:34 - Solidity overview & Prerequisite</li>\n    <li>01:17:33 - Remix IDE & Solidity Basic Structure</li>\n    <li>01:35:22 - Solidity Types & Variables</li>\n    <li>01:57:56 - Functions (View, Pure, Returns)</li>\n    <li>02:12:42 - State, Local & Global Variables</li>\n    <li>02:32:54 - Variable scopes</li>\n    <li>02:48:16 - Memory & Storage</li>\n    <li>03:01:01 - Operators - 1</li>\n    <li>03:17:07 - Operators - 2</li>\n    <li>03:36:52 - If-Else Statement</li>\n    <li>03:48:06 - Loops</li>\n    <li>04:05:29 - Arrays</li>\n    <li>04:20:44 - Struct</li>\n    <li>04:31:17 - Enums</li>\n    <li>04:37:15 - Mapping</li>\n    <li>04:42:40 - Constructor</li>\n    <li>04:51:27 - Events</li>\n    <li>05:01:15 - Payable</li>\n    <li>05:07:28 - Error Handling</li>\n    <li>05:22:02 - Function Modifiers</li>\n    <li>05:27:46 - Units</li>\n    <li>05:39:57 - Hashing functions</li>\n    <li>06:03:38 - Inheritance</li>\n    <li>06:18:35 - Function visibility</li>\n    <li>06:28:11 - Library</li>\n    <li>06:37:56 - Function overriding</li>\n    <li>06:45:28 - Abstract Contracts</li>\n    <li>06:54:40 - Interfaces</li>\n    <li>07:03:51 - Solidity Course outro</li>\n    <li>07:05:09 - Hardhat Introduction</li>\n    <li>07:09:45 - Hardhat Installation</li>\n    <li>07:16:12 - Hardhat Config - 1</li>\n    <li>07:31:42 - Hardhat Config - 2</li>\n    <li>08:00:59 - Compile Solidity Contracts</li>\n    <li>08:09:49 - Test & Debug Smart Contracts</li>\n    <li>08:49:20 - Deploy Smart Contracts</li>\n    <li>09:06:00 - Complete Ethers.js</li>\n    <li>10:36:35 - React Application Setup</li>\n    <li>10:42:53 - Metamask Interaction Methods</li>\n    <li>11:43:56 - Connecting Contracts to React</li>\n    <li>12:14:40 - Outro</li>\n  </ul>\n</div>\n<!-- DROPDOWN END -->\n\n<h4 style=\"color:#dc3545; margin-top:14px;\">Solidity Notes</h4>\n<p style=\"color:#333;\">\n<a href=\"https://drive.google.com/file/d/1bFTiUNWox1nxbjAOvXdLRtorVGVxiH7D/view\" target=\"_blank\" style=\"color:#28a745;\">Download Notes</a>\n</p>\n",
+          "duration": 44154,
+          "id": "lesson-1764590450045",
+          "minWatchTime": 60,
+          "order": 1,
+          "title": "Complete Blockchain Development Course for Beginners",
+          "videoId": "RkYVVC2vXho"
+        }
+      ],
+      "level": "beginner",
+      "thumbnail": "https://i.ibb.co/BHHNnCC8/maxresdefault.jpg",
+      "title": "Blockchain Development Course",
+      "updatedAt": "2025-12-01T12:02:13.103Z"
+    },
+    "course-1764591234558": {
+      "category": "category-1760166880946",
+      "createdAt": "2025-12-01T12:13:54.559Z",
+      "description": "AI & ML Python Course 2026 |  Beginner To Advance |  ( Internship + Job Ready ) BY Saumya Singh",
+      "instructor": "Saumya Singh",
+      "language": "Hindi",
+      "lessons": [
+        {
+          "description": "<h3 style=\"color:#007bff; margin-bottom:8px;\">Quick Learning: Python Course (Lesson)</h3>\n\n<p style=\"color:#555; margin-top:0; font-size:15px;\">\nThis lesson introduces Python programming from installation to writing your first program. It covers basics, features, setup guide, and beginner assignments for fast learning.\n</p>\n\n<!-- ORIGINAL VIDEO -->\n<p style=\"background:#fff3cd; padding:8px; border-left:5px solid #ffc107; color:#856404; font-weight:bold; margin-bottom:12px;\">\nOriginal Video: <a href=\"https://www.youtube.com/watch?v=&list=PLTV_nsuD2lf7JOwZdSWuup-YO0AUaDQti&index=3\" target=\"_blank\">Watch Here</a>\n</p>\n\n<!-- DROPDOWN START -->\n<div style=\"margin-bottom:14px;\">\n\n  <button onclick=\"this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';\" \n          style=\"background:#28a745; color:white; padding:10px 14px; border:none; border-radius:6px; cursor:pointer; font-size:15px;\">\n    Show/Hide Chapters\n  </button>\n\n  <ul style=\"display:none; margin-top:12px; color:#333; line-height:1.6; padding-left:18px; border-left:3px solid #28a745;\">\n\n    <li>00:00 - Python Course Intro</li>\n    <li>05:24 - What is Programming?</li>\n    <li>10:40 - Why Learn Python Programming?</li>\n    <li>11:00 - Features of Python</li>\n    <li>13:29 - Installing Python & VS Code Editor</li>\n    <li>14:16 - Install Python</li>\n    <li>19:34 - Code Editor Installation</li>\n    <li>23:16 - Making Folder in VS Code</li>\n    <li>27:32 - Hello World Program in Python</li>\n    <li>30:45 - Assignment</li>\n    <li>34:19 - Outro</li>\n\n  </ul>\n</div>\n<!-- DROPDOWN END -->\n\n<h4 style=\"color:#dc3545; margin-top:14px;\">Video Covers</h4>\n<p style=\"color:#333; line-height:1.6;\">\npython course 2026, python course for beginners, Python tutorial in Hindi, beginner to advanced python, free python course, installing python, installing VS Code, learning python 2026, features of python, python for first-year students, saumya singh python lesson.\n</p>\n",
+          "duration": 2128,
+          "id": "lesson-1764591425405",
+          "minWatchTime": 10,
+          "order": 1,
+          "title": "Python Full Course 2026",
+          "videoId": "s5MJpRBQLgo"
+        },
+        {
+          "description": "<h4 style=\"color:#dc3545; margin-top:14px;\">Video Covers</h4>\n<p style=\"color:#333; line-height:1.6;\">\npython variables, python variables explained, python variables full course, python full course,\npython course chapter 1 saumya singh, saumya singh python course, how Python code executes,\nvariables & memory concept, python type conversion, python chapter 1, python job ready course,\npython full course for beginners, beginner to advance python course, complete python course for BCA students.\n</p>\n",
+          "duration": 2570,
+          "id": "lesson-1764591545333",
+          "minWatchTime": 10,
+          "order": 2,
+          "title": "Chapter 01 - Python Variables & Fundamentals",
+          "videoId": "k8XeZg1oDyY"
+        },
+        {
+          "description": "<h4 style=\"color:#dc3545; margin-top:14px;\">Video Covers</h4>\n<p style=\"color:#333; line-height:1.6;\">\npython data types, python data types explained, python data types full course, python full course,\npython course chapter 1 saumya singh, saumya singh python course, how Python code executes,\ndata types in python, python type conversion, python chapter 2, python job ready course,\npython full course for beginners, beginner to advance python course, complete python course for BCA students,\ndata types in python 2026, operators in python.\n</p>\n",
+          "duration": 3819,
+          "id": "lesson-1764592065614",
+          "minWatchTime": 10,
+          "order": 3,
+          "title": "Chapter 02 - Data Types & Operators in Python",
+          "videoId": "5lDKZio6njw"
+        },
+        {
+          "description": "<h4 style=\"color:#dc3545; margin-top:14px;\">Video Covers</h4>\n<p style=\"color:#333; line-height:1.6;\">\npython strings, python strings explained, python strings full course, python full course,\npython course chapter 03 saumya singh, saumya singh python course, how Python code executes,\nstrings & memory concept, python type conversion, python chapter 03, python job ready course,\npython full course for beginners, beginner to advance python course, complete python course for BCA students.\n</p>\n",
+          "duration": 3267,
+          "id": "lesson-1764592176541",
+          "minWatchTime": 10,
+          "order": 4,
+          "title": " Chapter 03 - Strings in Python ",
+          "videoId": "GJV61hQH5LQ"
+        },
+        {
+          "description": "<h4 style=\"color:#dc3545; margin-top:14px;\">Video Covers</h4>\n<p style=\"color:#333; line-height:1.6;\">\nconditional statement in python, lists in python, tuples in python, python conditional statements,\nlist in python, python course 2026, saumya singh chapter 4 python course, free python course with certificate,\npython course certificate 2026, lists in python concept, beginner to advance python course,\npython course for beginners, Python tutorial for beginners in Hindi, complete python course,\npython course from beginner to advanced, python course in Hindi, free python course.\n</p>\n",
+          "duration": 3500,
+          "id": "lesson-1764592263373",
+          "minWatchTime": 10,
+          "order": 5,
+          "title": "Chapter 04 - Conditional Statement, List & Tuples in Python",
+          "videoId": "IJzmIEHmDsc"
+        },
+        {
+          "description": "<h4 style=\"color:#dc3545; margin-top:14px;\">Video Covers</h4>\n<p style=\"color:#333; line-height:1.6;\">\ndictionary in python, sets in python, python course 2026, saumya singh chapter 5 python course,\nfree python course with certificate, python course certificate 2026, lists in python concept,\nbeginner to advance python course, python course for beginners, Python tutorial for beginners in Hindi,\ncomplete python course, python course from beginner to advanced, python course in Hindi, free python course.\n</p>\n",
+          "duration": 2853,
+          "id": "lesson-1764592344550",
+          "minWatchTime": 10,
+          "order": 6,
+          "title": "Chapter 05 - Dictionary & Sets in Python",
+          "videoId": "WN0E2hjtcFg"
+        },
+        {
+          "description": "<h4 style=\"color:#dc3545; margin-top:14px;\">Video Covers</h4>\n<p style=\"color:#333; line-height:1.6;\">\nloops in python, looping in python, python course 2026, saumya singh chapter 6 python course,\nfree python course with certificate, python course certificate 2026, loop in python concept,\nbeginner to advance python course, python course for beginners, Python tutorial for beginners in Hindi,\ncomplete python course, python course from beginner to advanced, python course in Hindi, free python course.\n</p>\n",
+          "duration": 4651,
+          "id": "lesson-1764592413109",
+          "minWatchTime": 10,
+          "order": 7,
+          "title": "Chapter 06 - Loops in Python",
+          "videoId": "eIWhfEhek60"
+        },
+        {
+          "description": "<h4 style=\"color:#dc3545; margin-top:14px;\">Video Covers</h4>\n<p style=\"color:#333; line-height:1.6;\">\npython project, python real life project, python project ideas, python course 2026,\nsaumya singh chapter 6 python course, free python course with certificate,\npython course certificate 2026, loop in python concept, beginner to advance python course,\npython course for beginners, Python tutorial for beginners in Hindi, complete python course,\npython course from beginner to advanced, python course in Hindi, free python course.\n</p>\n",
+          "duration": 3261,
+          "id": "lesson-1764592780885",
+          "minWatchTime": 10,
+          "order": 8,
+          "title": "Python Project - 01 Personal Finance App - Expense Tracker",
+          "videoId": "mJLI-99RhbM"
+        },
+        {
+          "description": "<h4 style=\"color:#dc3545; margin-top:14px;\">Video Covers</h4>\n<p style=\"color:#333; line-height:1.6;\">\nfunctions in python, python course 2026, saumya singh chapter 7 python course,\nfree python course with certificate, python course certificate 2026, function in python concept,\nbeginner to advance python course, python course for beginners, Python tutorial for beginners in Hindi,\ncomplete python course, python course from beginner to advanced, python course in Hindi, free python course.\n</p>\n",
+          "duration": 3360,
+          "id": "lesson-1764592945878",
+          "minWatchTime": 10,
+          "order": 9,
+          "title": "Chapter 07 - Functions in Python",
+          "videoId": "EplHEeWhocs"
+        },
+        {
+          "description": "<h4 style=\"color:#dc3545; margin-top:14px;\">Video Covers</h4>\n<p style=\"color:#333; line-height:1.6;\">\npython project, python real life project, python project ideas, python course 2026,\nsaumya singh chapter 7 python course, free python course with certificate,\npython course certificate 2026, loop in python concept, beginner to advance python course,\npython course for beginners, Python tutorial for beginners in Hindi, complete python course,\npython course from beginner to advanced, python course in Hindi, free python course.\n</p>\n",
+          "duration": 1770,
+          "id": "lesson-1764593063222",
+          "minWatchTime": 10,
+          "order": 10,
+          "title": "Python Project - 02 Personal Chat Assistant",
+          "videoId": "hb2BkcZ1Yk0"
+        }
+      ],
+      "level": "intermediate",
+      "thumbnail": "https://i.ibb.co/fdNYLK99/maxresdefault.jpg",
+      "title": "Python Full Course",
+      "updatedAt": "2025-12-01T12:13:54.559Z"
+    },
+    "course-1764593629430": {
+      "category": "category-1760090630498",
+      "createdAt": "2025-12-01T12:53:49.431Z",
+      "description": "e are super excited to share that The #1 Flutter Course You Need to Watch in 2025 is finally on the way! This will be our very first time on YouTube teaching Flutter, and we’ve planned a full journey from beginner to pro. In this series, you will learn Flutter step by step, build real apps, and understand everything from the basics of Dart to advanced Flutter concepts.",
+      "instructor": "Neat Roots",
+      "language": "Hindi",
+      "lessons": [
+        {
+          "description": "<div style=\"background:#f9fbfd; padding:20px; border-radius:12px; font-family:Arial, sans-serif; line-height:1.6;\">\n\n  <h2 style=\"color:#007bff; margin-bottom:10px;\">Complete Flutter & Dart Course for Beginners (2025)</h2>\n\n  <p style=\"color:#333; font-size:15px;\">\n    We are super excited to share that the #1 Flutter Course you need to watch in 2025 is finally on the way! \n    This will be our first time on YouTube teaching Flutter, and we’ve built a complete journey from beginner to pro.\n    You will learn Flutter step by step, build real apps, and understand everything—from Dart basics to advanced Flutter concepts.\n  </p>\n\n  <p style=\"color:#333; font-size:15px;\">\n    Get ready for practical coding sessions, clear explanations, and a complete roadmap to becoming a professional Flutter developer.\n    Stay tuned, the wait is almost over!\n  </p>\n\n  <hr style=\"margin:20px 0; border:none; height:1px; background:#dee2e6;\">\n\n  <h3 style=\"color:#28a745;\">Matching Queries</h3>\n\n  <ul style=\"color:#333; padding-left:18px; line-height:1.7;\">\n    <li>What is Flutter App Development</li>\n    <li>Flutter and Dart Course for Beginners</li>\n    <li>Flutter Tutorial for Beginners</li>\n    <li>Flutter Full Course in Hindi</li>\n    <li>Flutter Tutorials for Beginners 2025</li>\n    <li>Flutter Free Course for Beginners</li>\n    <li>Full Stack Flutter Development Course</li>\n    <li>Learn Flutter Tutorial in Hindi</li>\n    <li>Full Stack Mobile App Development</li>\n    <li>Best Flutter Course in Hindi</li>\n    <li>Flutter Best Course for Free</li>\n    <li>Advanced Flutter Course in Hindi</li>\n    <li>How to Learn Flutter Development</li>\n    <li>Cross-Platform App Development</li>\n    <li>Neat Roots</li>\n  </ul>\n\n</div>\n",
+          "duration": 166,
+          "id": "lesson-1764593837870",
+          "minWatchTime": 1,
+          "order": 1,
+          "title": " Complete Flutter & Dart Course for Beginners",
+          "videoId": "LBv525XvCik"
+        },
+        {
+          "description": "<p style=\"color:#333; font-size:15px; line-height:1.6;\">\nIn this video, I’ll share the strategy you can follow to master Flutter and Dart before starting our upcoming full course. \nInstead of jumping into topics randomly, this roadmap will help you understand where to begin, what to learn first, and how to build your skills step by step.\n</p>\n\n<p style=\"color:#333; font-size:15px; line-height:1.6;\">\nIf you’re serious about learning app development, this strategy will give you a strong foundation and make the upcoming course much easier to follow.\n</p>\n",
+          "duration": 175,
+          "id": "lesson-1764594255430",
+          "minWatchTime": 1,
+          "order": 2,
+          "title": " Follow This Strategy to Learn Flutter & Dart Fast!",
+          "videoId": "54Op805lp8"
+        }
+      ],
+      "level": "beginner",
+      "thumbnail": "https://i.ibb.co/QVzc42L/maxresdefault.jpg",
+      "title": "Flutter & Dart Full Development Course",
+      "updatedAt": "2025-12-01T12:53:49.431Z"
+    }
+  },
+  "users": {
+    "WYbKcChuNgODH576t5je3hDYZj23": {
+      "lastLoginAt": "2025-12-01T19:05:22.217Z"
+    }
+  }
+}

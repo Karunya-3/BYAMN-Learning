@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Display streak counter on dashboard
     function displayStreakOnDashboard(streakManager) {
         // Remove existing streak sections to avoid duplicates
-        const existingStreakSections = document.querySelectorAll('[id*="streak"], .streak-section');
+        const existingStreakSections = document.querySelectorAll('[id*="streak"], .streak-section, .streak-card');
         existingStreakSections.forEach(section => section.remove());
 
         const statsGrid = document.querySelector('.stats-grid') || 
@@ -702,6 +702,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // Render analytics charts
             renderAnalyticsCharts(userAnalytics);
             
+            // Render progress and category charts
+            renderProgressChart(userEnrollments);
+            renderCategoryChart(userEnrollments, courses, categoryMap);
+            
             // Render learning patterns analysis
             renderLearningPatterns(learningPatterns, engagementScore);
             
@@ -789,6 +793,16 @@ document.addEventListener('DOMContentLoaded', function() {
             if (lessonsCompletedElement) lessonsCompletedElement.textContent = '0';
             if (learningStreakElement) learningStreakElement.textContent = '0';
             if (favoriteCategoryElement) favoriteCategoryElement.textContent = 'None';
+            
+            // Update new streak elements
+            const longestStreakElement = document.getElementById('longest-streak');
+            const weeklyProgressElement = document.getElementById('weekly-progress');
+            const motivationalMessageElement = document.getElementById('motivational-message');
+            
+            if (longestStreakElement) longestStreakElement.textContent = '0';
+            if (weeklyProgressElement) weeklyProgressElement.textContent = '0/7 days';
+            if (motivationalMessageElement) motivationalMessageElement.textContent = 'Complete a lesson today to start your learning streak! 💪';
+            
             return;
         }
         
@@ -806,14 +820,33 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Learning streak - use streak manager data if available, otherwise use analytics
-        if (learningStreakElement) {
-            if (streakManager) {
-                const streakStats = streakManager.getStreakStats();
-                learningStreakElement.textContent = streakStats.currentStreak;
-            } else {
-                learningStreakElement.textContent = analytics.learningStreak || 0;
-            }
+        let currentStreak = 0;
+        let longestStreak = 0;
+        
+        if (streakManager) {
+            const streakStats = streakManager.getStreakStats();
+            currentStreak = streakStats.currentStreak;
+            longestStreak = streakStats.longestStreak;
+        } else {
+            currentStreak = analytics.learningStreak || 0;
+            longestStreak = analytics.longestStreak || 0;
         }
+        
+        // Update streak elements
+        if (learningStreakElement) {
+            learningStreakElement.textContent = currentStreak;
+        }
+        
+        const longestStreakElement = document.getElementById('longest-streak');
+        if (longestStreakElement) {
+            longestStreakElement.textContent = longestStreak;
+        }
+        
+        // Update weekly pattern
+        updateWeeklyPattern(analytics, currentStreak);
+        
+        // Update motivational message
+        updateMotivationalMessage(currentStreak);
         
         // Favorite category
         if (favoriteCategoryElement && analytics.favoriteCategories) {
@@ -832,6 +865,89 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (favoriteCategoryElement) {
             favoriteCategoryElement.textContent = 'None';
         }
+    }
+    
+    // Update weekly pattern display
+    function updateWeeklyPattern(analytics, currentStreak) {
+        const weeklyPatternElement = document.getElementById('weekly-pattern');
+        const weeklyProgressElement = document.getElementById('weekly-progress');
+        
+        if (!weeklyPatternElement || !weeklyProgressElement) return;
+        
+        // Get the last 7 days
+        const days = [];
+        const dayNames = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+        const today = new Date();
+        
+        // Create an array of the last 7 days
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(today.getDate() - i);
+            const dateString = date.toISOString().split('T')[0];
+            days.push({
+                date: dateString,
+                dayName: dayNames[(today.getDay() - i + 7) % 7],
+                learned: false
+            });
+        }
+        
+        // Mark days with activity
+        let learnedDays = 0;
+        if (analytics && analytics.dailyActivity) {
+            days.forEach(day => {
+                if (analytics.dailyActivity[day.date]) {
+                    const activity = analytics.dailyActivity[day.date];
+                    if (activity.studyTime > 0 || activity.lessonsCompleted > 0) {
+                        day.learned = true;
+                        learnedDays++;
+                    }
+                }
+            });
+        }
+        
+        // Update progress text
+        weeklyProgressElement.textContent = `${learnedDays}/7 days`;
+        
+        // Update the visual pattern
+        const dayElements = weeklyPatternElement.querySelectorAll('.flex-1');
+        dayElements.forEach((element, index) => {
+            const day = days[index];
+            const barElement = element.querySelector('.h-2');
+            if (barElement) {
+                if (day.learned) {
+                    barElement.classList.remove('bg-gray-200');
+                    barElement.classList.add('bg-green-500');
+                } else {
+                    barElement.classList.remove('bg-green-500');
+                    barElement.classList.add('bg-gray-200');
+                }
+            }
+        });
+    }
+    
+    // Update motivational message based on streak
+    function updateMotivationalMessage(currentStreak) {
+        const motivationalMessageElement = document.getElementById('motivational-message');
+        if (!motivationalMessageElement) return;
+        
+        let message = '';
+        if (currentStreak === 0) {
+            message = 'Complete a lesson today to start your learning streak! 💪';
+        } else if (currentStreak === 1) {
+            message = 'Great start! Keep going to build your streak. 🔥';
+        } else if (currentStreak < 3) {
+            message = 'Nice work! Two days in a row! You\'re building momentum. Keep going! 💪';
+        } else if (currentStreak < 7) {
+            message = `Impressive ${currentStreak}-day streak! You\'re on fire! 🔥`;
+        } else if (currentStreak < 14) {
+            message = `Wow! ${currentStreak} days straight! You\'re a learning machine! 🚀`;
+        } else if (currentStreak < 30) {
+            message = `Legendary ${currentStreak}-day streak! You\'re unstoppable! ⭐`;
+        } else {
+            message = `Incredible ${currentStreak}-day streak! You\'re a learning champion! 🏆`;
+        }
+        
+        motivationalMessageElement.textContent = message;
     }
     
     // Render achievements
