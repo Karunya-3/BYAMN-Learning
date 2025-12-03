@@ -249,7 +249,7 @@ function renderCourseReviews(courseId, containerId, limit = null) {
                     </div>
                     <div class="ml-3">
                         <p class="text-sm font-medium text-gray-900">${review.username}</p>
-                        <p class="text-sm text-gray-500">${formatDate(review.date)}</p>
+                        <p class="text-sm text-gray-500">${utils.formatDate(review.date)}</p>
                     </div>
                 </div>
             </div>

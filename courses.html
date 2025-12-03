@@ -18,13 +18,13 @@
     <link rel="stylesheet" href="assets/css/styles.css">
     
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     
     <!-- Firebase configuration -->
-    <script src="assets/js/firebase.js"></script>
+    <script type="module" src="assets/js/firebase.js"></script>
     
     <style>
         body {
@@ -249,32 +249,17 @@
             box-shadow: 0 6px 12px rgba(79, 70, 229, 0.2);
         }
         
-        /* Loading spinner with enhanced design */
-        .loading-spinner {
-            width: 2.5rem;
-            height: 2.5rem;
-            border: 4px solid rgba(79, 70, 229, 0.2);
-            border-top: 4px solid #4f46e5;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
         /* Sorting dropdown styling */
         #sort-options {
-            border-radius: 0.75rem;
-            padding: 0.75rem 1rem;
-            font-size: 0.95rem;
+            border-radius: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
             font-weight: 500;
             color: #374151;
             background-color: white;
-            border: 2px solid #e5e7eb;
+            border: 1px solid #e5e7eb;
             transition: all 0.2s ease;
-            min-width: 180px;
+            min-width: 140px;
         }
         
         #sort-options:focus {
@@ -400,8 +385,8 @@
                     
                     <!-- User-specific actions - shown only on desktop -->
                     <div id="user-actions-desktop" class="hidden md:flex items-center space-x-3">
-                        <a href="auth/login.html" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium transition-colors">Login</a>
-                        <a href="auth/register.html" class="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 font-medium transition-colors">Get Started</a>
+                        <a href="auth/login.html" id="login-btn" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium transition-colors">Login</a>
+                        <a href="auth/register.html" id="signup-btn" class="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 font-medium transition-colors">Get Started</a>
                     </div>
                 </div>
             </div>
@@ -416,8 +401,8 @@
                     <a href="contact.html" class="px-3 py-2 rounded-lg text-gray-700 hover:text-indigo-600 font-medium transition-colors">Contact</a>
                     
                     <!-- Mobile user actions -->
-                    <div id="user-actions-mobile" class="pt-4 border-t border-gray-200 space-y-3">
-                        <a href="auth/login.html" class="block w-full text-center px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium transition-colors">
+                    <div id="user-actions-mobile" id="login-btn" class="pt-4 border-t border-gray-200 space-y-3">
+                        <a href="auth/login.html" id="signup-btn" class="block w-full text-center px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium transition-colors">
                             Login
                         </a>
                         <a href="auth/register.html" class="block w-full text-center px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 font-medium transition-colors">
@@ -519,18 +504,6 @@
                         </select>
                     </div>
                     
-                    <!-- Rating Filter -->
-                    <div>
-                        <label for="rating-filter" class="block text-sm font-medium text-gray-700 mb-1">Minimum Rating</label>
-                        <select id="rating-filter" class="w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="0">Any Rating</option>
-                            <option value="4.5">4.5+ Stars</option>
-                            <option value="4.0">4.0+ Stars</option>
-                            <option value="3.5">3.5+ Stars</option>
-                            <option value="3.0">3.0+ Stars</option>
-                        </select>
-                    </div>
-                    
                     <!-- Language Filter -->
                     <div>
                         <label for="language-filter" class="block text-sm font-medium text-gray-700 mb-1">Language</label>
@@ -542,73 +515,24 @@
                             <option value="German">German</option>
                         </select>
                     </div>
-                </div>
-            </div>
-
-            <!-- Advanced Filters Toggle -->
-            <div class="mb-6 text-center">
-                <button id="toggle-filters" class="inline-flex items-center text-indigo-600 font-medium hover:text-indigo-800 transition-colors">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
-                    </svg>
-                    Advanced Filters
-                </button>
-            </div>
-
-            <!-- Advanced Filters Panel -->
-            <div id="advanced-filters" class="hidden bg-white rounded-xl shadow-md p-6 mb-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <!-- Difficulty Filter -->
+                    
+                    <!-- Sorting Dropdown -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Difficulty</label>
-                        <select id="difficulty-filter" class="w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="all">All Levels</option>
-                            <option value="beginner">Beginner</option>
-                            <option value="intermediate">Intermediate</option>
-                            <option value="advanced">Advanced</option>
-                        </select>
-                    </div>
-
-                    <!-- Duration Filter -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Duration</label>
-                        <select id="duration-filter" class="w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="all">Any Duration</option>
-                            <option value="short">Short (&lt; 2 hours)</option>
-                            <option value="medium">Medium (2-6 hours)</option>
-                            <option value="long">Long (6+ hours)</option>
-                        </select>
-                    </div>
-
-                    <!-- Instructor Filter -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Instructor</label>
-                        <select id="instructor-filter" class="w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="all">All Instructors</option>
-                            <!-- Instructor options will be populated dynamically -->
-                        </select>
-                    </div>
-
-                    <!-- Price Filter -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Price</label>
-                        <select id="price-filter" class="w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="all">All Prices</option>
-                            <option value="free">Free</option>
-                            <option value="paid">Paid</option>
+                        <label for="sort-options" class="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+                        <select id="sort-options" class="w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="enrollmentDesc">Most Enrolled</option>
+                            <option value="enrollmentAsc">Least Enrolled</option>
+                            <option value="ratingDesc">Highest Rated</option>
+                            <option value="priceAsc">Price: Low to High</option>
+                            <option value="priceDesc">Price: High to Low</option>
                         </select>
                     </div>
                 </div>
-
-                <!-- Clear Filters Button -->
-                <div class="mt-6 flex justify-end">
-                    <button id="clear-filters" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
-                        Clear All Filters
-                    </button>
-                </div>
             </div>
 
-            <!-- Sorting and Filter Controls -->
+            <!-- Category Filters -->
             <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                 <!-- Category Filters -->
                 <div class="flex flex-wrap justify-center gap-3" id="category-filters">
@@ -618,24 +542,6 @@
                 <!-- Results Count -->
                 <div id="results-count" class="text-sm text-gray-600 font-medium">
                     <!-- Results count will be updated dynamically -->
-                </div>
-                
-                <!-- Sorting Dropdown -->
-                <div class="relative">
-                    <select id="sort-options" class="appearance-none bg-white border border-gray-300 rounded-lg py-3 px-4 pr-8 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="newest">Newest First</option>
-                        <option value="oldest">Oldest First</option>
-                        <option value="enrollmentDesc">Most Enrolled</option>
-                        <option value="enrollmentAsc">Least Enrolled</option>
-                        <option value="ratingDesc">Highest Rated</option>
-                        <option value="priceAsc">Price: Low to High</option>
-                        <option value="priceDesc">Price: High to Low</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-                        </svg>
-                    </div>
                 </div>
             </div>
         </div>

@@ -15,7 +15,20 @@ function logActivity(activityData) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+function initializeAuth() {
+    console.log('initializeAuth called');
+    console.log('firebaseServices available:', typeof firebaseServices !== 'undefined');
+    if (typeof firebaseServices !== 'undefined') {
+        console.log('firebaseServices keys:', Object.keys(firebaseServices));
+    }
+    
+    // Check if required Firebase services are available
+    if (typeof firebaseServices === 'undefined' || !firebaseServices.auth) {
+        console.error('Required Firebase services not available');
+        utils.showNotification('Authentication service not available. Please refresh the page.', 'error');
+        return;
+    }
+    
     // Login form
     const loginForm = document.getElementById('login-form');
     // Register form
@@ -25,11 +38,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Handle login form submission
     if (loginForm) {
+        console.log('Login form found, adding event listener');
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            console.log('Login form submitted');
 
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            console.log('Login attempt with email:', email);
 
             // Show loading state
             const submitBtn = loginForm.querySelector('button[type="submit"]');
@@ -44,8 +60,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitBtn.disabled = false;
             }, 10000); // 10 second timeout
 
+            // Check if firebaseServices is available
+            if (typeof firebaseServices === 'undefined') {
+                console.error('Firebase services not available');
+                utils.showNotification('Authentication service not available. Please refresh the page.', 'error');
+                clearTimeout(loginTimeout);
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                return;
+            }
+            
+            console.log('Firebase services are available, attempting login');
+
             // Directly attempt to sign in with email and password
             // This approach is more reliable than checking email existence first
+            console.log('Calling signInWithEmailAndPassword with email:', email);
+            
+            // Check if the specific method exists
+            if (typeof firebaseServices.signInWithEmailAndPassword !== 'function') {
+                console.error('signInWithEmailAndPassword method not available');
+                utils.showNotification('Authentication service not properly initialized. Please refresh the page.', 'error');
+                clearTimeout(loginTimeout);
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                return Promise.reject(new Error('Auth service not available'));
+            }
+            
             firebaseServices.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     // Clear timeout since login succeeded
@@ -101,14 +141,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Handle register form submission
     if (registerForm) {
+        console.log('Register form found, adding event listener');
         registerForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            console.log('Register form submitted');
 
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
             const terms = document.getElementById('terms').checked;
+            console.log('Registration attempt with name:', name, 'email:', email);
 
             // Validate passwords match
             if (password !== confirmPassword) {
@@ -128,8 +171,30 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Creating account...';
             submitBtn.disabled = true;
 
+            // Check if firebaseServices is available
+            if (typeof firebaseServices === 'undefined') {
+                console.error('Firebase services not available');
+                utils.showNotification('Registration service not available. Please refresh the page.', 'error');
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                return;
+            }
+            
+            console.log('Firebase services are available, attempting registration');
+
             // Check if email already exists before creating account
-            firebaseServices.auth.fetchSignInMethodsForEmail(email)
+            console.log('Checking if email exists:', email);
+            
+            // Check if the specific method exists
+            if (typeof firebaseServices.fetchSignInMethodsForEmail !== 'function') {
+                console.error('fetchSignInMethodsForEmail method not available');
+                utils.showNotification('Registration service not properly initialized. Please refresh the page.', 'error');
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                return Promise.reject(new Error('Registration service not available'));
+            }
+            
+            firebaseServices.fetchSignInMethodsForEmail(email)
                 .then((signInMethods) => {
                     if (signInMethods.length > 0) {
                         // Email already exists
@@ -140,6 +205,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         submitBtn.disabled = false;
                     } else {
                         // Email doesn't exist, proceed with registration
+                        console.log('Creating user with email:', email);
+                        
+                        // Check if the specific method exists
+                        if (typeof firebaseServices.createUserWithEmailAndPassword !== 'function') {
+                            console.error('createUserWithEmailAndPassword method not available');
+                            utils.showNotification('User creation service not properly initialized. Please refresh the page.', 'error');
+                            submitBtn.textContent = originalText;
+                            submitBtn.disabled = false;
+                            return Promise.reject(new Error('User creation service not available'));
+                        }
+                        
                         return firebaseServices.createUserWithEmailAndPassword(email, password)
                             .then((userCredential) => {
                                 // Signed up
@@ -217,6 +293,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle logout
     if (logoutBtn) {
         logoutBtn.addEventListener('click', function() {
+            // Check if firebaseServices is available
+            if (typeof firebaseServices === 'undefined') {
+                console.error('Firebase services not available');
+                utils.showNotification('Logout service not available. Please refresh the page.', 'error');
+                return;
+            }
+
             firebaseServices.signOut()
                 .then(() => {
                     // Sign-out successful
@@ -235,79 +318,98 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Check auth state and update UI
-    firebaseServices.onAuthStateChanged((user) => {
-        if (user) {
-            // User is signed in
-            console.log('User is signed in:', user);
+    if (typeof firebaseServices !== 'undefined' && firebaseServices.onAuthStateChanged) {
+        firebaseServices.onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in
+                console.log('User is signed in:', user);
 
-            // Update user name in header if element exists
-            const userNameElement = document.getElementById('user-name');
-            if (userNameElement) {
-                userNameElement.textContent = `Welcome, ${user.displayName || user.email}`;
+                // Update user name in header if element exists
+                const userNameElement = document.getElementById('user-name');
+                if (userNameElement) {
+                    userNameElement.textContent = `Welcome, ${user.displayName || user.email}`;
+                }
+
+                // Hide/show auth buttons based on auth state
+                const userActionsDesktop = document.getElementById('user-actions-desktop');
+                const userActionsMobile = document.getElementById('user-actions-mobile');
+
+                if (userActionsDesktop) {
+                    userActionsDesktop.innerHTML = `
+                        <span class="text-gray-700 dark:text-gray-300 font-medium">Welcome, ${user.displayName || user.email}</span>
+                        <button id="logout-btn" class="px-4 py-2 rounded-md bg-[#5624d0] hover:bg-[#451db0] text-white font-medium transition duration-300">
+                            Logout
+                        </button>
+                    `;
+
+                    // Add event listener to new logout button
+                    document.getElementById('logout-btn').addEventListener('click', function() {
+                        firebaseServices.signOut()
+                            .then(() => {
+                                // Force a full page reload to ensure clean state
+                                window.location.href = '../index.html';
+                            })
+                            .catch((error) => {
+                                console.error('Logout error:', error);
+                                utils.showNotification('Logout failed: ' + error.message, 'error');
+                                // Even if logout fails, redirect to homepage
+                                window.location.href = '../index.html';
+                            });
+                    });
+                }
+
+                if (userActionsMobile) {
+                    userActionsMobile.innerHTML = `
+                        <div class="px-3 py-2 text-gray-700 dark:text-gray-300 font-medium">
+                            Welcome, ${user.displayName || user.email}
+                        </div>
+                        <button id="mobile-logout-btn" class="block w-full text-center px-4 py-2 rounded-md bg-[#5624d0] hover:bg-[#451db0] text-white font-medium transition duration-300">
+                            Logout
+                        </button>
+                    `;
+
+                    // Add event listener to new mobile logout button
+                    document.getElementById('mobile-logout-btn').addEventListener('click', function() {
+                        firebaseServices.signOut()
+                            .then(() => {
+                                // Force a full page reload to ensure clean state
+                                window.location.href = '../index.html';
+                            })
+                            .catch((error) => {
+                                console.error('Logout error:', error);
+                                utils.showNotification('Logout failed: ' + error.message, 'error');
+                                // Even if logout fails, redirect to homepage
+                                window.location.href = '../index.html';
+                            });
+                    });
+                }
+            } else {
+                // User is signed out
+                console.log('User is signed out');
+
+                // Redirect to login page if on a protected page
+                const protectedPages = ['/dashboard.html', '/student-courses.html'];
+                if (protectedPages.includes(window.location.pathname)) {
+                    window.location.href = '../auth/login.html';
+                }
             }
+        });
+    }
+}
 
-            // Hide/show auth buttons based on auth state
-            const userActionsDesktop = document.getElementById('user-actions-desktop');
-            const userActionsMobile = document.getElementById('user-actions-mobile');
+// Initialize auth when DOM is loaded and Firebase is ready
+function initWhenReady() {
+    if (typeof firebaseServices !== 'undefined' && firebaseServices.auth) {
+        initializeAuth();
+    } else {
+        // Wait a bit more for Firebase to load
+        setTimeout(initWhenReady, 100);
+    }
+}
 
-            if (userActionsDesktop) {
-                userActionsDesktop.innerHTML = `
-                    <span class="text-gray-700 dark:text-gray-300 font-medium">Welcome, ${user.displayName || user.email}</span>
-                    <button id="logout-btn" class="px-4 py-2 rounded-md bg-[#5624d0] hover:bg-[#451db0] text-white font-medium transition duration-300">
-                        Logout
-                    </button>
-                `;
-
-                // Add event listener to new logout button
-                document.getElementById('logout-btn').addEventListener('click', function() {
-                    firebaseServices.signOut()
-                        .then(() => {
-                            // Force a full page reload to ensure clean state
-                            window.location.href = '../index.html';
-                        })
-                        .catch((error) => {
-                            console.error('Logout error:', error);
-                            utils.showNotification('Logout failed: ' + error.message, 'error');
-                            // Even if logout fails, redirect to homepage
-                            window.location.href = '../index.html';
-                        });
-                });
-            }
-
-            if (userActionsMobile) {
-                userActionsMobile.innerHTML = `
-                    <div class="px-3 py-2 text-gray-700 dark:text-gray-300 font-medium">
-                        Welcome, ${user.displayName || user.email}
-                    </div>
-                    <button id="mobile-logout-btn" class="block w-full text-center px-4 py-2 rounded-md bg-[#5624d0] hover:bg-[#451db0] text-white font-medium transition duration-300">
-                        Logout
-                    </button>
-                `;
-
-                // Add event listener to new mobile logout button
-                document.getElementById('mobile-logout-btn').addEventListener('click', function() {
-                    firebaseServices.signOut()
-                        .then(() => {
-                            // Force a full page reload to ensure clean state
-                            window.location.href = '../index.html';
-                        })
-                        .catch((error) => {
-                            console.error('Logout error:', error);
-                            utils.showNotification('Logout failed: ' + error.message, 'error');
-                            // Even if logout fails, redirect to homepage
-                            window.location.href = '../index.html';
-                        });
-                });
-            }
-        } else {
-            // User is signed out
-            console.log('User is signed out');
-
-            // Redirect to login page if on a protected page
-            const protectedPages = ['/dashboard.html', '/student-courses.html'];
-            if (protectedPages.includes(window.location.pathname)) {
-                window.location.href = '../auth/login.html';
-            }
-        }
-    });
-});
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initWhenReady);
+} else {
+    // DOM is already loaded, initialize when ready
+    initWhenReady();
+}

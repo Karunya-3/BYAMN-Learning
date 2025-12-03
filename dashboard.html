@@ -24,14 +24,14 @@
     <link rel="stylesheet" href="assets/css/styles.css" />
 
     <!-- Firebase SDK - Using compat versions without type="module" -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
     <!-- Firebase configuration -->
-    <script src="assets/js/firebase.js"></script>
+    <script type="module" src="assets/js/firebase.js"></script>
 
     <style>
       body {
@@ -40,71 +40,33 @@
           sans-serif;
       }
 
-      /* Header and navigation styles */
-      @media (max-width: 1024px) {
-        .header-nav {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-
-        .header-nav a {
-          margin-bottom: 1rem;
-        }
-      }
-
-      /* Stats cards */
-      .stats-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1rem;
-      }
-
-      /* Course cards */
-      .course-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1rem;
-      }
-
-      /* Progress chart */
-      .clip-segment {
+      /* Streak card enhancements */
+      .streak-card {
         transition: all 0.3s ease;
       }
-
-      /* Loading spinner */
-      .loading-spinner {
-        width: 2.5rem;
-        height: 2.5rem;
-        border: 4px solid rgba(79, 70, 229, 0.2);
-        border-top: 4px solid #4f46e5;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
+      
+      .streak-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
       }
-
-      @keyframes spin {
+      
+      .streak-flame {
+        animation: pulse 2s infinite;
+      }
+      
+      @keyframes pulse {
         0% {
-          transform: rotate(0deg);
+          transform: scale(1);
+          box-shadow: 0 0 0 0 rgba(255, 165, 0, 0.4);
+        }
+        70% {
+          transform: scale(1.05);
+          box-shadow: 0 0 0 10px rgba(255, 165, 0, 0);
         }
         100% {
-          transform: rotate(360deg);
+          transform: scale(1);
+          box-shadow: 0 0 0 0 rgba(255, 165, 0, 0);
         }
-      }
-
-      /* Hover lift effect for cards */
-      .hover-lift {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      .hover-lift:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-          0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      }
-
-      /* Line clamp for text truncation */
-      .line-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
       }
 
       /* Responsive adjustments */
@@ -125,31 +87,15 @@
           var(--tw-gradient-stops)
         );
       }
-
-      /* Engagement score colors */
-      .text-excellent {
-        color: #10b981;
-      }
-      .text-good {
-        color: #3b82f6;
-      }
-      .text-average {
-        color: #f59e0b;
-      }
-      .text-needs-improvement {
-        color: #ef4444;
-      }
     </style>
   </head>
   <body class="min-h-screen bg-white">
     <!-- Header -->
     <header
-      data-aos-duration="800"
       class="bg-white shadow-sm sticky top-0 z-10"
     >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
-          data-aos="fade-down"
           class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 gap-4"
         >
           <div class="flex items-center">
@@ -283,36 +229,8 @@
           </div>
         </div>
 
-        <div
-          class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all duration-300"
-        >
-          <div class="flex items-center">
-            <div class="p-3 rounded-lg bg-[#e5e7eb]">
-              <svg
-                class="h-6 w-6 text-blue-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm8-12a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2v-6a2 2 0 00-2-2h-2z"
-                />
-              </svg>
-            </div>
-            <div class="ml-4">
-              <h3 class="text-lg font-medium text-gray-900">Certificates</h3>
-              <p
-                id="certificates-count"
-                class="text-2xl font-bold text-blue-500"
-              >
-                0
-              </p>
-            </div>
-          </div>
-        </div>
+
+
       </div>
 
       <!-- Analytics Section -->
@@ -382,9 +300,9 @@
 
           <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
             <div class="flex items-center">
-              <div class="p-3 rounded-lg bg-amber-100">
+              <div class="p-3 rounded-lg bg-blue-100">
                 <svg
-                  class="h-6 w-6 text-amber-600"
+                  class="h-6 w-6 text-blue-600"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -393,15 +311,15 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
-                    d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm8-12a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2v-6a2 2 0 00-2-2h-2z"
                   />
                 </svg>
               </div>
               <div class="ml-4">
-                <p class="text-sm font-medium text-gray-600">Learning Streak</p>
+                <p class="text-sm font-medium text-gray-600">Certificates</p>
                 <p
                   class="text-2xl font-semibold text-gray-900"
-                  id="learning-streak"
+                  id="certificates-count"
                 >
                   0
                 </p>
@@ -409,107 +327,108 @@
             </div>
           </div>
 
+          <!-- Improved Learning Streak Card -->
           <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-            <div class="flex items-center">
-              <div class="p-3 rounded-lg bg-purple-100">
-                <svg
-                  class="h-6 w-6 text-purple-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-.38 1.81.588 1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
-                  />
-                </svg>
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center">
+                <div class="p-2 rounded-lg bg-gradient-to-r from-orange-500 to-red-500">
+                  <svg class="h-6 w-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd"/>
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm font-medium text-gray-600">Learning Streak</p>
+                  <p class="text-xl font-bold text-orange-600" id="learning-streak">0</p>
+                </div>
               </div>
-              <div class="ml-4">
-                <p class="text-sm font-medium text-gray-600">
-                  Favorite Category
-                </p>
-                <p
-                  class="text-2xl font-semibold text-gray-900"
-                  id="favorite-category"
-                >
-                  None
-                </p>
+              <div class="text-right">
+                <p class="text-xs text-gray-500">Longest</p>
+                <p class="text-sm font-semibold text-gray-700" id="longest-streak">0</p>
               </div>
+            </div>
+            
+            <!-- Weekly Progress -->
+            <div class="mt-3">
+              <div class="flex justify-between text-xs text-gray-500 mb-1">
+                <span>This Week</span>
+                <span id="weekly-progress">0/7 days</span>
+              </div>
+              <div class="flex gap-1" id="weekly-pattern">
+                <!-- Monday -->
+                <div class="flex-1 text-center">
+                  <div class="h-2 rounded-full mb-1 bg-gray-200"></div>
+                  <div class="text-xs text-gray-500">M</div>
+                </div>
+                <!-- Tuesday -->
+                <div class="flex-1 text-center">
+                  <div class="h-2 rounded-full mb-1 bg-gray-200"></div>
+                  <div class="text-xs text-gray-500">T</div>
+                </div>
+                <!-- Wednesday -->
+                <div class="flex-1 text-center">
+                  <div class="h-2 rounded-full mb-1 bg-gray-200"></div>
+                  <div class="text-xs text-gray-500">W</div>
+                </div>
+                <!-- Thursday -->
+                <div class="flex-1 text-center">
+                  <div class="h-2 rounded-full mb-1 bg-gray-200"></div>
+                  <div class="text-xs text-gray-500">T</div>
+                </div>
+                <!-- Friday -->
+                <div class="flex-1 text-center">
+                  <div class="h-2 rounded-full mb-1 bg-gray-200"></div>
+                  <div class="text-xs text-gray-500">F</div>
+                </div>
+                <!-- Saturday -->
+                <div class="flex-1 text-center">
+                  <div class="h-2 rounded-full mb-1 bg-gray-200"></div>
+                  <div class="text-xs text-gray-500">S</div>
+                </div>
+                <!-- Sunday -->
+                <div class="flex-1 text-center">
+                  <div class="h-2 rounded-full mb-1 bg-gray-200"></div>
+                  <div class="text-xs text-gray-500">S</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Motivational Message -->
+            <div class="mt-3 p-2 bg-orange-50 rounded-lg border border-orange-200">
+              <p class="text-xs text-orange-800 text-center" id="motivational-message">
+                Complete a lesson today to start your learning streak! 💪
+              </p>
             </div>
           </div>
         </div>
 
-        <!-- Detailed Analytics -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <!-- Study Time Chart -->
+        <!-- Learning Progress Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <!-- Progress Distribution Chart -->
           <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-              Study Time (Last 7 Days)
-            </h3>
-            <div id="study-time-chart-container" class="h-64">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Learning Progress</h3>
+            <div id="progress-chart-container" class="h-64">
               <div class="flex items-center justify-center h-full">
-                <div class="text-center">
-                  <div class="loading-spinner mx-auto"></div>
-                  <p class="mt-4 text-gray-600">Loading analytics...</p>
+                <div class="text-center text-gray-500">
+                  <svg class="mx-auto h-12 w-12 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <p class="mt-2">Loading progress data...</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Activity Chart -->
+          <!-- Category Distribution Chart -->
           <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-              Lessons Completed (Last 14 Days)
-            </h3>
-            <div id="activity-chart-container" class="h-64">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Course Categories</h3>
+            <div id="category-chart-container" class="h-64">
               <div class="flex items-center justify-center h-full">
-                <div class="text-center">
-                  <div class="loading-spinner mx-auto"></div>
-                  <p class="mt-4 text-gray-600">Loading activity data...</p>
+                <div class="text-center text-gray-500">
+                  <svg class="mx-auto h-12 w-12 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <p class="mt-2">Loading category data...</p>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Learning Patterns Section -->
-        <div
-          class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 mb-8"
-        >
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">
-            Learning Patterns
-          </h3>
-          <div id="learning-patterns-container">
-            <div class="flex items-center justify-center h-64">
-              <div class="text-center">
-                <div class="loading-spinner mx-auto"></div>
-                <p class="mt-4 text-gray-600">
-                  Analyzing your learning patterns...
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Achievements Section -->
-        <div
-          class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 mb-8"
-        >
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Achievements</h3>
-            <a
-              href="#"
-              class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
-              >View All</a
-            >
-          </div>
-          <div id="achievements-container">
-            <div class="flex items-center justify-center py-8">
-              <div class="text-center">
-                <div class="loading-spinner mx-auto"></div>
-                <p class="mt-4 text-gray-600">Loading achievements...</p>
               </div>
             </div>
           </div>
@@ -528,100 +447,6 @@
                 <div class="loading-spinner mx-auto"></div>
                 <p class="mt-4 text-gray-600">Finding recommendations...</p>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Learning Challenges Section -->
-      <div class="bg-white rounded-xl shadow-md mb-8">
-        <div class="px-6 py-5 border-b border-gray-200">
-          <h2 class="text-xl font-semibold text-gray-800">
-            Learning Challenges
-          </h2>
-          <p class="text-gray-600 mt-1">
-            Complete weekly and monthly challenges to earn badges and track your
-            progress
-          </p>
-        </div>
-        <div class="p-6">
-          <div id="challenges-container">
-            <!-- Challenges will be loaded here dynamically -->
-            <div class="text-center py-12">
-              <div class="loading-spinner mx-auto mb-4"></div>
-              <p class="text-gray-600">Loading challenges...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Achievements Section -->
-      <div class="bg-white rounded-xl shadow-md mb-8">
-        <div class="px-6 py-5 border-b border-gray-200">
-          <h2 class="text-xl font-semibold text-gray-800">Your Achievements</h2>
-          <p class="text-gray-600 mt-1">
-            Track your progress and celebrate your accomplishments
-          </p>
-        </div>
-        <div class="p-6">
-          <div
-            id="achievements-container"
-            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            <!-- Achievements will be loaded here dynamically -->
-            <div class="text-center py-8">
-              <svg
-                class="mx-auto h-12 w-12 text-gray-400 animate-spin"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  class="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                ></circle>
-                <path
-                  class="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              <p class="mt-4 text-gray-600">Loading your achievements...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Achievements Section -->
-      <div class="bg-white rounded-xl shadow-md mb-8">
-        <div class="px-6 py-5 border-b border-gray-200">
-          <h2 class="text-xl font-semibold text-gray-800">My Achievements</h2>
-        </div>
-        <div class="p-6">
-          <div id="achievements-container">
-            <div class="text-center py-8">
-              <svg
-                class="mx-auto h-12 w-12 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.982 8.982M12 2.944a11.955 11.955 0 018.982 8.982M5.018 15.018A8.96 8.96 0 0112 12a8.96 8.96 0 016.982 3.018M12 12v9m-4-9h8"
-                />
-              </svg>
-              <h3 class="mt-2 text-lg font-medium text-gray-900">
-                No achievements yet
-              </h3>
-              <p class="mt-1 text-gray-500">
-                Complete courses and maintain streaks to earn achievements.
-              </p>
             </div>
           </div>
         </div>
@@ -663,26 +488,12 @@
             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             <!-- Courses will be loaded here dynamically -->
-            <div class="text-center py-12">
-              <svg
-                class="mx-auto h-16 w-16 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                />
+            <div class="text-center py-12 col-span-full">
+              <svg class="animate-spin mx-auto h-12 w-12 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              <h3 class="mt-4 text-lg font-medium text-gray-900">
-                No enrolled courses yet
-              </h3>
-              <p class="mt-2 text-gray-500">
-                Get started by browsing our course catalog
-              </p>
+              <p class="mt-4 text-gray-600">Loading your courses...</p>
             </div>
           </div>
         </div>
@@ -691,8 +502,7 @@
 
     <!-- Footer -->
     <footer
-      data-aos-duration="1000"
-      class="bg-neutral-900 text-white mt-24 fade-in"
+      class="bg-neutral-900 text-white mt-24"
     >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -836,44 +646,6 @@
     <script src="assets/js/offline-sync.js"></script>
     <script src="assets/js/streak.js"></script>
     <script src="assets/js/challenges.js"></script>
-    <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        // Check if user is authenticated
-        firebase.auth().onAuthStateChanged(function (user) {
-          if (user) {
-            // Update user name in header
-            const userNameElement = document.getElementById('user-name');
-            if (userNameElement) {
-              userNameElement.textContent = `Welcome, ${
-                user.displayName || user.email
-              }`;
-            }
-          } else {
-            // Redirect to login page if not authenticated
-            window.location.href = './auth/login.html';
-          }
-        });
-
-        // Logout functionality
-        const logoutBtn = document.getElementById('logout-btn');
-        if (logoutBtn) {
-          logoutBtn.addEventListener('click', function () {
-            firebase
-              .auth()
-              .signOut()
-              .then(function () {
-                window.location.href = './index.html';
-              })
-              .catch(function (error) {
-                console.error('Sign out error:', error);
-                utils.showNotification(
-                  'Error signing out: ' + error.message,
-                  'error'
-                );
-              });
-          });
-        }
-      });
-    </script>
+    <!-- Authentication handled by external JS files -->
   </body>
 </html>

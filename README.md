@@ -1,10 +1,4 @@
-```{=html}
-<p align="center">
-```
-`<img src="main.svg" alt="Main" width="300" />`{=html}
-```{=html}
-</p>
-```
+
 # BYAMN Learning Platform
 
 Transform YouTube learning into verified achievement with free
@@ -92,6 +86,16 @@ configure your own Firebase project:
 2.  Register your web app in Firebase
 3.  Update the Firebase configuration in `assets/js/firebase.js` with
     your project credentials
+
+### Loading Demo Data
+
+If you see "Error loading courses" on the homepage, you need to load the demo data:
+
+1. Open `load-demo-data.html` in your browser
+2. Click the "Load Demo Data" button
+3. Refresh the homepage to see the courses
+
+For more details, see `README-FIX.md`.
 
 ## Project Structure
 
