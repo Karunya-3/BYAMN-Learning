@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Auth - BYAMN</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script type="module" src="./assets/js/firebase.js"></script>
+</head>
+<body>
+    <h1>Auth Test</h1>
+    <div id="status">Loading...</div>
+    
+    <script>
+        // Check if Firebase is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const statusDiv = document.getElementById('status');
+            
+            console.log('DOM loaded');
+            console.log('firebase:', typeof firebase);
+            console.log('firebaseServices:', typeof firebaseServices);
+            
+            if (typeof firebase !== 'undefined') {
+                statusDiv.innerHTML += '<p>Firebase loaded: Yes</p>';
+            } else {
+                statusDiv.innerHTML += '<p>Firebase loaded: No</p>';
+            }
+            
+            if (typeof firebaseServices !== 'undefined') {
+                statusDiv.innerHTML += '<p>firebaseServices loaded: Yes</p>';
+                statusDiv.innerHTML += '<p>Available services: ' + Object.keys(firebaseServices).join(', ') + '</p>';
+            } else {
+                statusDiv.innerHTML += '<p>firebaseServices loaded: No</p>';
+            }
+        });
+    </script>
+</body>
+</html>

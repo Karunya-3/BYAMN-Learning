@@ -1503,7 +1503,6 @@ body.theme-transition * {
   font-weight: 500;
   color: var(--text-body);
 }
-
 /* Footer Styles */
 .footer-links h3 {
   font-weight: 700;
@@ -1533,6 +1532,15 @@ body.theme-transition * {
   color: var(--color-white);
 }
 
+/* Social Icons */
+.footer-social {
+  display: flex;
+  justify-content: center; /* center horizontally */
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
 .footer-social a {
   display: inline-flex;
   align-items: center;
@@ -1543,7 +1551,6 @@ body.theme-transition * {
   background-color: var(--neutral-800);
   color: var(--neutral-400);
   transition: all var(--transition-fast) ease;
-  margin-right: 0.5rem;
 }
 
 .footer-social a:hover {
@@ -1552,14 +1559,51 @@ body.theme-transition * {
   transform: translateY(-2px);
 }
 
+/* --- NEW FIXES FOR CENTERING COPYRIGHT + LINKS + ICONS --- */
+
+/* Footer bottom wrapper (everything centered) */
+.footer-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-top: 2rem;
+  margin-top: 2rem;
+  border-top: 1px solid var(--neutral-800);
+  gap: 1rem;
+}
+
+/* Centered copyright */
 .footer-copyright {
   color: var(--neutral-500);
   font-size: 0.875rem;
   line-height: 1.25rem;
-  border-top: 1px solid var(--neutral-800);
-  padding-top: 2rem;
-  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
 }
+
+/* Small footer navigation links below copyright */
+.footer-small-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.footer-small-nav a {
+  color: var(--neutral-400);
+  text-decoration: none;
+  transition: color 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.footer-small-nav a:hover {
+  color: var(--color-white);
+}
+
+
+
 
 /* Modern Form Styles */
 .form-container {
@@ -4040,4 +4084,19 @@ body.theme-transition * {
 
 .bounce {
     animation: bounce 1s ease infinite;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 4px solid rgba(79, 70, 229, 0.2);
+  border-top: 4px solid #4f46e5;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
