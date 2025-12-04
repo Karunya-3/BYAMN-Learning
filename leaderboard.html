@@ -294,12 +294,36 @@
             border-radius: var(--radius-md);
             padding: 25px;
             box-shadow: var(--shadow);
+            margin-bottom: 30px;
         }
         
         .chart-header {
             font-size: 1.2rem;
             font-weight: 700;
             margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chart-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chart-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .chart-btn:hover {
+            background: var(--accent-primary);
+            color: white;
         }
         
         .chart-bars {
@@ -307,16 +331,71 @@
             align-items: flex-end;
             gap: 10px;
             height: 200px;
+            position: relative;
+            padding-bottom: 30px;
+        }
+        
+        .chart-bar-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
         }
         
         .chart-bar {
-            flex: 1;
+            width: 100%;
             background: linear-gradient(to top, var(--accent-primary), #4895ef);
             border-radius: 4px 4px 0 0;
             min-height: 5%;
             position: relative;
+            transition: var(--transition);
+            cursor: pointer;
         }
         
+        .chart-bar:hover {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+
+        .chart-bar-label {
+            position: absolute;
+            bottom: -30px;
+            font-size: 0.7rem;
+            text-align: center;
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chart-bar-value {
+            position: absolute;
+            top: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        /* Advanced chart styles */
+        .chart-grid {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .chart-grid-line {
+            height: 1px;
+            background: rgba(0, 0, 0, 0.05);
+            width: 100%;
+        }
+
         .loading {
             text-align: center;
             padding: 50px;
@@ -324,14 +403,14 @@
             font-size: 1.2rem;
             font-weight: 500;
         }
-        
-        footer {
+
+        /* footer {
             text-align: center;
             padding: 30px 0;
             color: var(--text-secondary);
             font-size: 0.9rem;
-        }
-        
+        } */
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .container {
@@ -372,12 +451,17 @@
                 padding: 12px 15px;
             }
             
-            .chart-bars {
+            /* .chart-bars {
                 gap: 5px;
                 height: 150px;
             }
+            
+            .chart-bar-label {
+                font-size: 0.6rem;
+            } */
+
         }
-        
+
         @media (max-width: 480px) {
             h1 {
                 font-size: 1.8rem;
@@ -399,6 +483,17 @@
                 width: 100%;
                 justify-content: center;
             }
+            
+            /* .chart-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .chart-controls {
+                align-self: flex-end;
+            } */
+
         }
     </style>
 </head>
@@ -417,8 +512,8 @@
                     <div class="stat-value" id="total-contributions">0</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">Repository Status</div>
-                    <div class="stat-value"><i class="fas fa-check-circle" style="color: #2ecc71;"></i></div>
+                    <div class="stat-label">Certificates Awarded</div>
+                    <div class="stat-value" id="certificates-awarded">0</div>
                 </div>
             </div>
         </header>
@@ -440,16 +535,11 @@
             </div>
         </div>
         
-        <div class="chart-container">
-            <div class="chart-header">Contribution Distribution</div>
-            <div class="chart-bars" id="chart-bars">
-                <!-- Chart bars will be populated by JavaScript -->
-            </div>
-        </div>
         
-        <footer>
+        
+        <!-- <footer>
             <p>Data sourced from GitHub API • Updated in real-time</p>
-        </footer>
+        </footer> -->
     </div>
 
     <script>
@@ -492,7 +582,7 @@
                 // Render UI Components
                 updateStats(leaderboard);
                 renderLeaderboardTable(leaderboard);
-                renderChart(leaderboard);
+                // renderChart(leaderboard); - Removed chart rendering
         
             } catch (error) {
                 console.warn("Error loading data. Showing mock data.", error);
@@ -539,7 +629,7 @@
                     userMap[user] = {
                         login: user,
                         avatar: pr.user.avatar_url,
-                        xp: 0,
+                        status: 0, // Changed from xp to status
                         mass: 0,      
                         velocity: 0,  
                         prCount: 0
@@ -557,7 +647,7 @@
                     else if (name.includes('level 1') || name.includes('low')) { prPoints = SCORING.PR.L1; massGain = 10; }
                 });
         
-                userMap[user].xp += prPoints;
+                userMap[user].status += prPoints; // Changed from xp to status
                 userMap[user].mass += massGain;
                 userMap[user].prCount++;
         
@@ -568,23 +658,23 @@
             });
         
             // Finalize & Sort
-            const leaderboard = Object.values(userMap).sort((a, b) => b.xp - a.xp);
+            const leaderboard = Object.values(userMap).sort((a, b) => b.status - a.status); // Changed from xp to status
             
-            // Assign Ranks, Classes & Status
+            // Assign Ranks, Classes & Certificates
             return leaderboard.map((contributor, index) => {
                 contributor.rank = index + 1;
                 
                 // Determine Class (Level) - Adjusted for learning repo
-                if (contributor.xp >= 5000) contributor.level = 'MASTER';
-                else if (contributor.xp >= 2000) contributor.level = 'ADVANCED';
-                else if (contributor.xp >= 1000) contributor.level = 'INTERMEDIATE';
-                else if (contributor.xp >= 300) contributor.level = 'BEGINNER';
+                if (contributor.status >= 5000) contributor.level = 'MASTER';
+                else if (contributor.status >= 2000) contributor.level = 'ADVANCED';
+                else if (contributor.status >= 1000) contributor.level = 'INTERMEDIATE';
+                else if (contributor.status >= 300) contributor.level = 'BEGINNER';
                 else contributor.level = 'NEWBIE';
         
-                // Determine Status
-                if (contributor.velocity > 60) contributor.status = 'ACTIVE';
-                else if (contributor.velocity > 20) contributor.status = 'REGULAR';
-                else contributor.status = 'OCCASIONAL';
+                // Determine Certificate - Changed from status to certificate
+                if (contributor.velocity > 60) contributor.certificate = 'GOLD';
+                else if (contributor.velocity > 20) contributor.certificate = 'SILVER';
+                else contributor.certificate = 'BRONZE';
         
                 return contributor;
             });
@@ -600,6 +690,10 @@
             // Calculate total contributions
             const totalContributions = data.reduce((sum, contributor) => sum + contributor.prCount, 0);
             document.getElementById('total-contributions').textContent = totalContributions;
+            
+            // Calculate certificates awarded
+            const certificatesAwarded = data.length; // Each contributor gets a certificate
+            document.getElementById('certificates-awarded').textContent = certificatesAwarded;
         }
         
         function renderLeaderboardTable(data) {
@@ -617,8 +711,8 @@
                             <th>Contributor</th>
                             <th>Level</th>
                             <th>Activity</th>
-                            <th>XP</th>
                             <th>Status</th>
+                            <th>Certificate</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -631,6 +725,25 @@
                 if(contributor.level === 'MASTER') levelColor = '#e63946';
                 if(contributor.level === 'ADVANCED') levelColor = '#f72585';
                 if(contributor.level === 'INTERMEDIATE') levelColor = '#4895ef';
+                
+                // Status colors (GOLD, SILVER, BRONZE)
+                let statusColor = '';
+                if(contributor.status >= 5000) {
+                    statusColor = '#FFD700'; // Gold
+                } else if(contributor.status >= 2000) {
+                    statusColor = '#C0C0C0'; // Silver
+                } else if(contributor.status >= 1000) {
+                    statusColor = '#CD7F32'; // Bronze
+                } else {
+                    statusColor = '#4361ee'; // Blue for lower levels
+                }
+                
+                // Certificate colors - All green now
+                let certificateColor = '#2ecc71'; // Green color
+                let certificateBg = 'rgba(46, 204, 113, 0.2)'; // Light green background
+                
+                // Certificate text
+                let certificateText = 'Get Certificate';
                 
                 const activityPercent = Math.min(contributor.velocity, 100);
                 
@@ -651,10 +764,10 @@
                             <div class="bar-bg">
                                 <div class="bar-fill" style="width: ${activityPercent}%"></div>
                             </div>
-                            <span>${contributor.velocity}</span>
+                            <!-- Removed the velocity number -->
                         </td>
-                        <td class="xp-cell">${contributor.xp.toLocaleString()}</td>
-                        <td><span class="status-badge status-${contributor.status.toLowerCase()}">${contributor.status}</span></td>
+                        <td class="xp-cell" style="color: ${statusColor}; font-weight: bold;">${contributor.status.toLocaleString()}</td>
+                        <td><span class="status-badge" id="cert-${contributor.login}" style="cursor: pointer; background: ${certificateBg}; color: ${certificateColor}">${certificateText}</span></td>
                     </tr>
                 `;
             });
@@ -681,26 +794,151 @@
             document.getElementById('export-btn').addEventListener('click', () => {
                 exportData(data);
             });
+            
+            // Add certificate claiming functionality
+            data.slice(0, 30).forEach(contributor => {
+                const certCell = document.getElementById(`cert-${contributor.login}`);
+                if (certCell) {
+                    certCell.addEventListener('click', () => {
+                        claimCertificate(contributor);
+                    });
+                }
+            });
         }
         
         function renderChart(data) {
             const container = document.getElementById('chart-bars');
             container.innerHTML = '';
             
-            // Visualize Top 15 XP distribution
+            // Add grid lines
+            const grid = document.createElement('div');
+            grid.className = 'chart-grid';
+            for (let i = 0; i < 5; i++) {
+                const line = document.createElement('div');
+                line.className = 'chart-grid-line';
+                grid.appendChild(line);
+            }
+            container.appendChild(grid);
+            
+            // Visualize Top 15 status distribution
             const slice = data.slice(0, 15);
             if (!slice.length) return;
             
-            const maxScore = slice[0].xp;
+            const maxStatus = slice[0].status;
         
             slice.forEach((contributor, i) => {
+                const barContainer = document.createElement('div');
+                barContainer.className = 'chart-bar-container';
+                
+                const barHeight = Math.max((contributor.status / maxStatus) * 100, 5);
+                
                 const bar = document.createElement('div');
                 bar.className = 'chart-bar';
-                const height = Math.max((contributor.xp / maxScore) * 100, 5);
-                bar.style.height = `${height}%`;
-                bar.title = `${contributor.login}: ${contributor.xp} XP`;
-                container.appendChild(bar);
+                bar.style.height = `${barHeight}%`;
+                bar.title = `${contributor.login}: ${contributor.status} Status`;
+                
+                // Add value label
+                const valueLabel = document.createElement('div');
+                valueLabel.className = 'chart-bar-value';
+                valueLabel.textContent = contributor.status.toLocaleString();
+                
+                // Add username label
+                const userLabel = document.createElement('div');
+                userLabel.className = 'chart-bar-label';
+                userLabel.textContent = contributor.login;
+                userLabel.title = contributor.login;
+                
+                barContainer.appendChild(bar);
+                barContainer.appendChild(valueLabel);
+                barContainer.appendChild(userLabel);
+                container.appendChild(barContainer);
+                
+                // Add hover effect
+                bar.addEventListener('mouseenter', (e) => {
+                    bar.style.transform = 'scale(1.1)';
+                    bar.style.zIndex = '10';
+                });
+                
+                bar.addEventListener('mouseleave', (e) => {
+                    bar.style.transform = 'scale(1)';
+                    bar.style.zIndex = '1';
+                });
             });
+            
+            // Add chart type switching
+            document.getElementById('chart-type-bar').addEventListener('click', () => {
+                renderBarChart(data);
+            });
+            
+            document.getElementById('chart-type-line').addEventListener('click', () => {
+                renderLineChart(data);
+            });
+        }
+        
+        function renderBarChart(data) {
+            renderChart(data);
+        }
+        
+        function renderLineChart(data) {
+            const container = document.getElementById('chart-bars');
+            container.innerHTML = '';
+            
+            // Add grid lines
+            const grid = document.createElement('div');
+            grid.className = 'chart-grid';
+            for (let i = 0; i < 5; i++) {
+                const line = document.createElement('div');
+                line.className = 'chart-grid-line';
+                grid.appendChild(line);
+            }
+            container.appendChild(grid);
+            
+            // Create SVG for line chart
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('width', '100%');
+            svg.setAttribute('height', '100%');
+            svg.style.position = 'absolute';
+            svg.style.top = '0';
+            svg.style.left = '0';
+            
+            // Visualize Top 15 status distribution as line chart
+            const slice = data.slice(0, 15);
+            if (!slice.length) return;
+            
+            const maxStatus = slice[0].status;
+            const points = [];
+            
+            slice.forEach((contributor, i) => {
+                const x = (i / (slice.length - 1)) * 100;
+                const y = 100 - (contributor.status / maxStatus) * 80; // Leave some padding at top
+                points.push(`${x}%,${y}%`);
+            });
+            
+            // Create line
+            const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+            polyline.setAttribute('points', points.join(' '));
+            polyline.setAttribute('fill', 'none');
+            polyline.setAttribute('stroke', 'var(--accent-primary)');
+            polyline.setAttribute('stroke-width', '3');
+            svg.appendChild(polyline);
+            
+            // Add data points
+            slice.forEach((contributor, i) => {
+                const x = (i / (slice.length - 1)) * 100;
+                const y = 100 - (contributor.status / maxStatus) * 80;
+                
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', `${x}%`);
+                circle.setAttribute('cy', `${y}%`);
+                circle.setAttribute('r', '5');
+                circle.setAttribute('fill', 'var(--accent-primary)');
+                circle.setAttribute('stroke', 'white');
+                circle.setAttribute('stroke-width', '2');
+                circle.title = `${contributor.login}: ${contributor.status} Status`;
+                svg.appendChild(circle);
+            });
+            
+            container.appendChild(svg);
         }
         
         // Function to get the appropriate icon for each level
@@ -722,9 +960,14 @@
         }
         
         function exportData(data) {
-            let csvContent = "Rank,Username,XP,Level,Status,Contributions,Mass,Velocity\n";
+            let csvContent = "Rank,Username,Status,Level,Certificate,Contributions,Mass,Velocity\n";
             data.forEach(contributor => {
-                csvContent += `${contributor.rank},${contributor.login},${contributor.xp},${contributor.level},${contributor.status},${contributor.prCount},${contributor.mass},${contributor.velocity}\n`;
+                // Determine certificate based on velocity
+                let certificate = 'BRONZE';
+                if(contributor.velocity > 60) certificate = 'GOLD';
+                else if(contributor.velocity > 20) certificate = 'SILVER';
+                
+                csvContent += `${contributor.rank},${contributor.login},${contributor.status},${contributor.level},${certificate},${contributor.prCount},${contributor.mass},${contributor.velocity}\n`;
             });
             
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -741,18 +984,43 @@
             alert('Leaderboard data exported successfully!');
         }
         
+        function claimCertificate(contributor) {
+            // Determine certificate based on velocity
+            let certificate = 'BRONZE';
+            let certificateColor = '#2ecc71'; // Green color
+            let certificateBg = 'rgba(46, 204, 113, 0.2)'; // Light green background
+            
+            if(contributor.velocity > 60) {
+                certificate = 'GOLD';
+            } else if(contributor.velocity > 20) {
+                certificate = 'SILVER';
+            }
+            
+            // Update the certificate cell
+            const certCell = document.getElementById(`cert-${contributor.login}`);
+            if (certCell) {
+                certCell.textContent = certificate;
+                certCell.style.color = certificateColor;
+                certCell.style.background = certificateBg;
+                certCell.style.cursor = 'default';
+                
+                // Show alert
+                alert(`Congratulations! ${contributor.login} has claimed their ${certificate} certificate!`);
+            }
+        }
+        
         function loadMockData() {
             const mockData = [
-                { login: "dev_master", avatar: "https://ui-avatars.com/api/?name=dev_master&background=random", xp: 5500, velocity: 85, mass: 70, prCount: 18, rank: 1, level: "MASTER", status: "ACTIVE" },
-                { login: "advanced_coder", avatar: "https://ui-avatars.com/api/?name=advanced_coder&background=random", xp: 3200, velocity: 65, mass: 45, prCount: 14, rank: 2, level: "ADVANCED", status: "ACTIVE" },
-                { login: "intermediate_dev", avatar: "https://ui-avatars.com/api/?name=intermediate_dev&background=random", xp: 1800, velocity: 40, mass: 30, prCount: 10, rank: 3, level: "INTERMEDIATE", status: "REGULAR" },
-                { login: "beginner_coder", avatar: "https://ui-avatars.com/api/?name=beginner_coder&background=random", xp: 750, velocity: 25, mass: 15, prCount: 6, rank: 4, level: "BEGINNER", status: "REGULAR" },
-                { login: "new_contributor", avatar: "https://ui-avatars.com/api/?name=new_contributor&background=random", xp: 200, velocity: 10, mass: 5, prCount: 2, rank: 5, level: "NEWBIE", status: "OCCASIONAL" },
+                { login: "dev_master", avatar: "https://ui-avatars.com/api/?name=dev_master&background=random", status: 5500, velocity: 85, mass: 70, prCount: 18, rank: 1, level: "MASTER" },
+                { login: "advanced_coder", avatar: "https://ui-avatars.com/api/?name=advanced_coder&background=random", status: 3200, velocity: 65, mass: 45, prCount: 14, rank: 2, level: "ADVANCED" },
+                { login: "intermediate_dev", avatar: "https://ui-avatars.com/api/?name=intermediate_dev&background=random", status: 1800, velocity: 40, mass: 30, prCount: 10, rank: 3, level: "INTERMEDIATE" },
+                { login: "beginner_coder", avatar: "https://ui-avatars.com/api/?name=beginner_coder&background=random", status: 750, velocity: 25, mass: 15, prCount: 6, rank: 4, level: "BEGINNER" },
+                { login: "new_contributor", avatar: "https://ui-avatars.com/api/?name=new_contributor&background=random", status: 200, velocity: 10, mass: 5, prCount: 2, rank: 5, level: "NEWBIE" },
             ];
             
             updateStats(mockData);
             renderLeaderboardTable(mockData);
-            renderChart(mockData);
+            // renderChart(mockData); - Removed chart rendering
         }
     </script>
 </body>
