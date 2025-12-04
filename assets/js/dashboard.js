@@ -976,6 +976,17 @@ document.addEventListener('DOMContentLoaded', function() {
         
         achievementsContainer.innerHTML = achievementsHTML;
     }
+
+        // Initialize learning path visualization if container exists
+    if (document.getElementById('learning-patterns-container')) {
+        // Load the learning path visualizer script
+        const script = document.createElement('script');
+        script.src = './assets/js/path-visualizer.js';
+        script.onload = function() {
+            console.log('Learning path visualizer loaded');
+        };
+        document.head.appendChild(script);
+    }
     
     // Helper function to generate achievement card HTML
     function generateAchievementCardHTML(achievement) {

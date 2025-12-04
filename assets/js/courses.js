@@ -13,6 +13,10 @@ let bookmarkedCourses = new Set(); // Store bookmarked course IDs
 let searchDebounceTimer;
 let userCompletedCourses = new Set(); // Store user's completed course IDs
 
+// Course Collections Integration
+let userCollections = []; // Store user collections
+let activeCollectionId = null; // Track active collection
+
 // Function to load sample data for debugging purposes
 function loadSampleData() {
     console.log('Loading sample data...');
@@ -153,6 +157,37 @@ function saveBookmarkedCourses() {
     } catch (error) {
         console.error('Error saving bookmarked courses:', error);
     }
+}
+
+// Load user collections (add this function)
+async function loadUserCollections() {
+    if (window.collections && window.collections.loadUserCollections) {
+        try {
+            await window.collections.loadUserCollections();
+        } catch (error) {
+            console.error('Error loading collections:', error);
+        }
+    }
+}
+
+// Add this function to handle adding to collections from course cards
+function showAddToCollectionDropdown(courseId, buttonElement) {
+    if (window.collections && window.collections.showAddToCollectionDropdown) {
+        window.collections.showAddToCollectionDropdown(courseId, buttonElement);
+    } else {
+        // Fallback: show create collection modal
+        if (window.collections && window.collections.showCreateCollectionModal) {
+            window.collections.showCreateCollectionModal();
+        }
+    }
+}
+
+// Add to collection function (wrapper)
+async function addCourseToCollectionWrapper(collectionId, courseId) {
+    if (window.collections && window.collections.addCourseToCollection) {
+        return await window.collections.addCourseToCollection(collectionId, courseId);
+    }
+    return false;
 }
 
 // Toggle bookmark for a course
@@ -733,6 +768,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Load bookmarked courses
     loadBookmarkedCourses();
+    
+    // Load collections
+    loadUserCollections();
 
     // Wait a bit for Firebase to initialize, then load courses and categories
     setTimeout(loadCategoriesAndCourses, 1000);
@@ -1574,7 +1612,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Difficulty filters rendered');
     }
 
-    // Main function to render courses with prerequisites and reviews
+    // Main function to render courses with prerequisites, reviews and collections button
     async function renderCourses(courses) {
         if (!coursesContainer) return;
 
@@ -1696,6 +1734,16 @@ document.addEventListener('DOMContentLoaded', function() {
                             </svg>
                         </button>
                         
+                        <!-- Add to Collection Button -->
+                        <button class="add-to-collection-btn absolute top-4 right-28 z-10 p-2 bg-white rounded-full shadow-sm hover:bg-gray-100 transition-colors"
+                                data-course-id="${course.id}"
+                                title="Add to collection">
+                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                            </svg>
+                        </button>
+                        
                         <div class="h-48 overflow-hidden">
                             <img class="w-full h-full object-cover lazy-load" data-src="${course.thumbnail || 'https://images.unsplash.com/photo-1547658719-da2b51169166?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80'}" alt="${course.title}" loading="lazy">
                         </div>
@@ -1770,6 +1818,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
             
+            // Add event listeners for collection buttons
+            document.querySelectorAll('.add-to-collection-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const courseId = this.getAttribute('data-course-id');
+                    showAddToCollectionDropdown(courseId, this);
+                });
+            });
+            
             // Observe images for lazy loading
             document.querySelectorAll('.lazy-load').forEach(img => {
                 imageObserver.observe(img);
@@ -1811,6 +1868,16 @@ document.addEventListener('DOMContentLoaded', function() {
                             data-course-id="${course.id}"
                             title="${isBookmarked ? 'Remove from bookmarks' : 'Save for later'}">
                         <svg class="h-6 w-6 bookmark-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                        </svg>
+                    </button>
+                    
+                    <!-- Add to Collection Button -->
+                    <button class="add-to-collection-btn absolute top-4 right-28 z-10 p-2 bg-white rounded-full shadow-sm hover:bg-gray-100 transition-colors"
+                            data-course-id="${course.id}"
+                            title="Add to collection">
+                        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                         </svg>
                     </button>
@@ -1881,6 +1948,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.stopPropagation();
                 const courseId = this.getAttribute('data-course-id');
                 toggleBookmark(courseId);
+            });
+        });
+        
+        // Add event listeners for collection buttons
+        document.querySelectorAll('.add-to-collection-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const courseId = this.getAttribute('data-course-id');
+                showAddToCollectionDropdown(courseId, this);
             });
         });
         

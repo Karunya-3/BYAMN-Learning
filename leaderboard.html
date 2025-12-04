@@ -512,7 +512,7 @@
                     <div class="stat-value" id="total-contributions">0</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">Unlocked Certificates</div>
+                    <div class="stat-label">Certificates Awarded</div>
                     <div class="stat-value" id="certificates-awarded">0</div>
                 </div>
             </div>
@@ -691,9 +691,9 @@
             const totalContributions = data.reduce((sum, contributor) => sum + contributor.prCount, 0);
             document.getElementById('total-contributions').textContent = totalContributions;
             
-            // Calculate unlocked certificates (contributors with 5000+ points)
-            const unlockedCertificates = data.filter(contributor => contributor.status >= 5000).length;
-            document.getElementById('certificates-awarded').textContent = unlockedCertificates;
+            // Calculate certificates awarded
+            const certificatesAwarded = data.length; // Each contributor gets a certificate
+            document.getElementById('certificates-awarded').textContent = certificatesAwarded;
         }
         
         function renderLeaderboardTable(data) {
@@ -742,16 +742,8 @@
                 let certificateColor = '#2ecc71'; // Green color
                 let certificateBg = 'rgba(46, 204, 113, 0.2)'; // Light green background
                 
-                // Certificate text and availability
+                // Certificate text
                 let certificateText = 'Get Certificate';
-                let certificateEnabled = contributor.status >= 5000; // Minimum 5000 points required
-                
-                // If not eligible, show locked state
-                if (!certificateEnabled) {
-                    certificateText = 'Locked';
-                    certificateColor = '#95a5a6'; // Gray color for locked
-                    certificateBg = 'rgba(149, 165, 166, 0.2)'; // Light gray background
-                }
                 
                 const activityPercent = Math.min(contributor.velocity, 100);
                 
@@ -775,7 +767,7 @@
                             <!-- Removed the velocity number -->
                         </td>
                         <td class="xp-cell" style="color: ${statusColor}; font-weight: bold;">${contributor.status.toLocaleString()}</td>
-                        <td><span class="status-badge" id="cert-${contributor.login}" style="cursor: ${certificateEnabled ? 'pointer' : 'not-allowed'}; background: ${certificateBg}; color: ${certificateColor}; opacity: ${certificateEnabled ? '1' : '0.6'}">${certificateText}</span></td>
+                        <td><span class="status-badge" id="cert-${contributor.login}" style="cursor: pointer; background: ${certificateBg}; color: ${certificateColor}">${certificateText}</span></td>
                     </tr>
                 `;
             });
@@ -803,15 +795,13 @@
                 exportData(data);
             });
             
-            // Add certificate claiming functionality (only for eligible contributors)
+            // Add certificate claiming functionality
             data.slice(0, 30).forEach(contributor => {
-                if (contributor.status >= 5000) { // Only add event listener for eligible contributors
-                    const certCell = document.getElementById(`cert-${contributor.login}`);
-                    if (certCell) {
-                        certCell.addEventListener('click', () => {
-                            claimCertificate(contributor);
-                        });
-                    }
+                const certCell = document.getElementById(`cert-${contributor.login}`);
+                if (certCell) {
+                    certCell.addEventListener('click', () => {
+                        claimCertificate(contributor);
+                    });
                 }
             });
         }
@@ -883,6 +873,8 @@
             document.getElementById('chart-type-line').addEventListener('click', () => {
                 renderLineChart(data);
             });
+            
+            container.appendChild(svg);
         }
         
         function renderBarChart(data) {
@@ -995,12 +987,6 @@
         }
         
         function claimCertificate(contributor) {
-            // Check if contributor meets minimum requirement
-            if (contributor.status < 5000) {
-                alert('You need at least 5000 points to claim a certificate!');
-                return;
-            }
-            
             // Determine certificate based on velocity
             let certificate = 'BRONZE';
             let certificateColor = '#2ecc71'; // Green color
@@ -1036,6 +1022,7 @@
             
             updateStats(mockData);
             renderLeaderboardTable(mockData);
+            // renderChart(mockData); - Removed chart rendering
         }
     </script>
 </body>

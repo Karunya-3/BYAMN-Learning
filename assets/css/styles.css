@@ -4086,17 +4086,102 @@ body.theme-transition * {
     animation: bounce 1s ease infinite;
 }
 
-/* Loading Spinner */
+/* Learning Path Visualization Styles */
+
+.learning-path-container {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.course-node {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.course-node:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.course-node::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #e5e7eb;
+}
+
+.course-node.completed::before {
+    background: #10b981;
+}
+
+.course-node.in-progress::before {
+    background: #3b82f6;
+}
+
+.recommendation-card {
+    transition: all 0.3s ease;
+}
+
+.recommendation-card:hover {
+    transform: translateY(-2px);
+    border-color: #6366f1;
+}
+
+.recommendation-card .enroll-btn {
+    transition: all 0.2s ease;
+}
+
+.recommendation-card .enroll-btn:hover {
+    transform: scale(1.05);
+}
+
+.line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
 .loading-spinner {
-  width: 2.5rem;
-  height: 2.5rem;
-  border: 4px solid rgba(79, 70, 229, 0.2);
-  border-top: 4px solid #4f46e5;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid rgba(99, 102, 241, 0.2);
+    border-top: 3px solid #6366f1;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .learning-path-container .grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .course-node::before {
+        left: -20px;
+        width: 8px;
+        height: 8px;
+    }
 }
