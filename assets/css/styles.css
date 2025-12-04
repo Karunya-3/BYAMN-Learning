@@ -4507,3 +4507,62 @@ body.theme-transition * {
         grid-template-columns: 1fr !important;
     }
 }
+
+/* Learning Journal Styles */
+.reflection-card {
+    transition: all 0.2s ease;
+    border-left: 4px solid #6366f1;
+}
+
+.reflection-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+}
+
+.reflection-date {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.reflection-text {
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+/* Reflection Modal Styles */
+#reflection-modal textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+#reflection-modal textarea:focus {
+    outline: none;
+    ring: 2px solid #6366f1;
+}
+
+/* Journal Entry Styles */
+.journal-entry {
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.journal-entry::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.5rem;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #6366f1;
+}
+
+/* Animation for new reflection */
+@keyframes highlightReflection {
+    0% { background-color: rgba(99, 102, 241, 0.1); }
+    100% { background-color: transparent; }
+}
+
+.highlight-new {
+    animation: highlightReflection 2s ease-out;
+}

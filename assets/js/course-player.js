@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressPercent = document.getElementById('progress-percent');
     const progressPercentTop = document.getElementById('progress-percent-top');
     const progressPercentTopMain = document.getElementById('progress-percent-top-main');
-    const lessonDuration = document.getElementById('lesson-duration');
     const progressBar = document.getElementById('progress-bar');
     const lessonsList = document.getElementById('lessons-list');
     const lessonsCount = document.getElementById('lessons-count');
@@ -28,6 +27,12 @@ document.addEventListener('DOMContentLoaded', function() {
     let certificateNameInput = null;
     let certificateSaveBtn = null;
     let certificateSkipBtn = null;
+    
+    // Reflection modal elements
+    let reflectionModal = null;
+    let reflectionTextArea = null;
+    let saveReflectionBtn = null;
+    let cancelReflectionBtn = null;
     
     // State variables
     let currentUser = null;
@@ -41,7 +46,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let minWatchTime = 0; // Minimum time required to watch (in seconds)
     let lessonStartTime = null; // For detailed analytics
     let totalLessonTime = 0; // Total time spent on current lesson
-    let pauseStartTime = null; // Track when user paused
     let totalPauseTime = 0; // Total time paused
     
     // Video analytics tracking
@@ -182,15 +186,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         showError('Course data is invalid or incomplete.');
                         return;
                     }
-                    
-                    // Log lesson structure for debugging
-                    console.log('Lesson structure:', currentCourse.lessons.map((lesson, index) => ({
-                        index,
-                        id: lesson.id,
-                        title: lesson.title,
-                        minWatchTime: lesson.minWatchTime,
-                        duration: lesson.duration
-                    })));
                     
                     // Find or create enrollment
                     let enrollmentData = enrollments.find(enroll => enroll.courseId === trimmedCourseId);
@@ -579,7 +574,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Reset detailed analytics tracking
         lessonStartTime = new Date(); // Start tracking when lesson loads
         totalLessonTime = 0;
-        pauseStartTime = null;
         totalPauseTime = 0;
         
         // Reset video events tracking
@@ -604,6 +598,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Immediately update button visibility based on loaded watched time
         updateButtonVisibility(lesson);
+        
+        // Setup reflection button
+        setupReflectionButton(courseId, lesson.id);
         
         // Validate lesson data
         if (!lesson) {
@@ -640,8 +637,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 lessonDescription.textContent = 'No description available for this lesson.';
             }
         }
-        
-        if (lessonDuration) lessonDuration.textContent = `Duration: ${formatDuration(lesson.duration || 0)}`;
         
         // Update progress percentage in the header
         if (progressPercentTopMain) {
@@ -798,9 +793,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const lesson = currentCourse.lessons[currentLessonIndex];
         
         console.log('Player state changed:', event.data);
-        console.log('Player states - UNSTARTED:', YT.PlayerState.UNSTARTED, 'ENDED:', YT.PlayerState.ENDED, 
-                    'PLAYING:', YT.PlayerState.PLAYING, 'PAUSED:', YT.PlayerState.PAUSED, 
-                    'BUFFERING:', YT.PlayerState.BUFFERING, 'CUED:', YT.PlayerState.CUED);
         
         if (event.data == YT.PlayerState.PLAYING) {
             // Video started playing
@@ -827,9 +819,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const timeDiff = (endTime - watchStartTime) / 1000; // Convert to seconds
                 watchedTime += timeDiff;
                 watchStartTime = null;
-                
-                // Track pause time
-                pauseStartTime = new Date();
                 
                 // Track pause event
                 videoEvents.pauseEvents++;
@@ -1858,6 +1847,177 @@ document.addEventListener('DOMContentLoaded', function() {
     window.currentCourse = currentCourse;
     window.currentLesson = currentLesson;
 });
+
+/**
+ * Setup reflection button for current lesson
+ */
+function setupReflectionButton(courseId, lessonId) {
+    const actionsContainer = document.querySelector('.lesson-actions');
+    if (!actionsContainer) return;
+
+    // Check if reflection button already exists
+    if (document.getElementById('reflection-btn')) {
+        return;
+    }
+
+    const reflectionBtn = document.createElement('button');
+    reflectionBtn.id = 'reflection-btn';
+    reflectionBtn.className = 'px-4 py-2 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 flex items-center';
+    reflectionBtn.innerHTML = `
+        <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+        Write Reflection
+    `;
+
+    reflectionBtn.addEventListener('click', function() {
+        showReflectionModal(courseId, lessonId);
+    });
+
+    // Insert before other buttons
+    actionsContainer.insertBefore(reflectionBtn, actionsContainer.firstChild);
+    
+    // Check if user already has a reflection for this lesson
+    if (window.learningJournal) {
+        window.learningJournal.getLessonReflection(courseId, lessonId)
+            .then(reflection => {
+                if (reflection) {
+                    reflectionBtn.innerHTML = `
+                        <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Edit Reflection
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error checking for existing reflection:', error);
+            });
+    }
+}
+
+/**
+ * Show reflection modal
+ */
+function showReflectionModal(courseId, lessonId) {
+    // Create modal HTML
+    const modalHTML = `
+        <div id="reflection-modal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                    <div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                What did you learn?
+                            </h3>
+                            <div class="mt-4">
+                                <textarea 
+                                    id="reflection-text" 
+                                    rows="8" 
+                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-3" 
+                                    placeholder="Take a moment to reflect on what you learned in this lesson. What were the key takeaways? What questions do you still have?"
+                                ></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                        <button 
+                            type="button" 
+                            id="save-reflection-btn"
+                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm"
+                        >
+                            Save Reflection
+                        </button>
+                        <button 
+                            type="button" 
+                            id="cancel-reflection-btn"
+                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Add modal to body
+    const modalContainer = document.createElement('div');
+    modalContainer.innerHTML = modalHTML;
+    document.body.appendChild(modalContainer);
+
+    // Get existing reflection if any
+    if (window.learningJournal) {
+        window.learningJournal.getLessonReflection(courseId, lessonId)
+            .then(reflection => {
+                if (reflection && reflection.text) {
+                    document.getElementById('reflection-text').value = reflection.text;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading existing reflection:', error);
+            });
+    }
+
+    // Add event listeners
+    document.getElementById('save-reflection-btn').addEventListener('click', async function() {
+        const reflectionText = document.getElementById('reflection-text').value.trim();
+        
+        if (!reflectionText) {
+            if (window.utils && window.utils.showNotification) {
+                window.utils.showNotification('Please write something before saving', 'warning');
+            }
+            return;
+        }
+
+        this.disabled = true;
+        this.innerHTML = '<svg class="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...';
+
+        try {
+            await window.learningJournal.saveReflection(courseId, lessonId, reflectionText);
+            
+            // Update button text
+            const reflectionBtn = document.getElementById('reflection-btn');
+            if (reflectionBtn) {
+                reflectionBtn.innerHTML = `
+                    <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Edit Reflection
+                `;
+            }
+            
+            // Close modal
+            document.body.removeChild(modalContainer);
+            
+            // Show success message
+            if (window.utils && window.utils.showNotification) {
+                window.utils.showNotification('Reflection saved successfully!', 'success');
+            }
+            
+        } catch (error) {
+            console.error('Error saving reflection:', error);
+            if (window.utils && window.utils.showNotification) {
+                window.utils.showNotification('Error saving reflection: ' + error.message, 'error');
+            }
+            this.disabled = false;
+            this.textContent = 'Save Reflection';
+        }
+    });
+
+    document.getElementById('cancel-reflection-btn').addEventListener('click', function() {
+        document.body.removeChild(modalContainer);
+    });
+
+    // Close modal when clicking outside
+    document.getElementById('reflection-modal').addEventListener('click', function(e) {
+        if (e.target.id === 'reflection-modal') {
+            document.body.removeChild(modalContainer);
+        }
+    });
+}
 
 /**
  * Initialize calendar integration for course player

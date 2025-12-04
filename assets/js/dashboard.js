@@ -29,6 +29,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const bookmarksSection = document.getElementById('bookmarks-section');
     const bookmarksCountElement = document.getElementById('bookmarks-count');
     
+    // Journal elements
+    const journalContainer = document.getElementById('journal-container');
+    const exportJournalBtn = document.getElementById('export-journal-btn');
+    
     // Store bookmarked courses
     let bookmarkedCourses = [];
     let allCourses = [];
@@ -630,6 +634,198 @@ document.addEventListener('DOMContentLoaded', function() {
         dashboardContainer.insertAdjacentHTML('afterbegin', offlineProgressHTML);
     }
 
+    // Load learning journal entries
+    async function loadLearningJournal() {
+        if (!journalContainer || !window.learningJournal) return;
+        
+        // Show loading state
+        journalContainer.innerHTML = `
+            <div class="flex items-center justify-center py-8">
+                <div class="text-center">
+                    <div class="loading-spinner mx-auto"></div>
+                    <p class="mt-4 text-gray-600">Loading your reflections...</p>
+                </div>
+            </div>
+        `;
+        
+        try {
+            const reflections = await window.learningJournal.getAllReflections();
+            
+            if (reflections.length === 0) {
+                journalContainer.innerHTML = `
+                    <div class="text-center py-8">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        <h3 class="mt-2 text-lg font-medium text-gray-900">No reflections yet</h3>
+                        <p class="mt-1 text-gray-500">Write your first reflection after completing a lesson!</p>
+                        <p class="mt-2 text-sm text-gray-400">Reflections help reinforce learning and track your progress</p>
+                    </div>
+                `;
+                if (exportJournalBtn) exportJournalBtn.style.display = 'none';
+                return;
+            }
+            
+            // Show export button
+            if (exportJournalBtn) {
+                exportJournalBtn.style.display = 'inline-flex';
+                exportJournalBtn.addEventListener('click', () => {
+                    window.learningJournal.exportToFile(reflections);
+                });
+            }
+            
+            // Group reflections by date
+            const groupedReflections = {};
+            reflections.forEach(reflection => {
+                const date = new Date(reflection.createdAt).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                if (!groupedReflections[date]) {
+                    groupedReflections[date] = [];
+                }
+                groupedReflections[date].push(reflection);
+            });
+            
+            // Render journal entries
+            let journalHTML = '';
+            
+            for (const [date, dayReflections] of Object.entries(groupedReflections)) {
+                journalHTML += `
+                    <div class="mb-8">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">${date}</h3>
+                        <div class="space-y-4">
+                `;
+                
+                dayReflections.forEach(reflection => {
+                    const time = new Date(reflection.createdAt).toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    const previewText = reflection.text.length > 200 
+                        ? reflection.text.substring(0, 200) + '...'
+                        : reflection.text;
+                    
+                    journalHTML += `
+                        <div class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h4 class="font-medium text-gray-900">${reflection.lessonTitle || 'Untitled Lesson'}</h4>
+                                    <p class="text-sm text-gray-500">${time}</p>
+                                </div>
+                                <button 
+                                    class="delete-reflection-btn text-red-500 hover:text-red-700 p-1"
+                                    data-course-id="${reflection.courseId}"
+                                    data-lesson-id="${reflection.lessonId}"
+                                >
+                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <p class="text-gray-700">${previewText}</p>
+                            <button 
+                                class="view-full-btn mt-2 text-sm text-indigo-600 hover:text-indigo-800"
+                                data-full-text="${reflection.text.replace(/"/g, '&quot;')}"
+                            >
+                                View full reflection →
+                            </button>
+                        </div>
+                    `;
+                });
+                
+                journalHTML += `
+                        </div>
+                    </div>
+                `;
+            }
+            
+            journalContainer.innerHTML = journalHTML;
+            
+            // Add event listeners for delete buttons
+            document.querySelectorAll('.delete-reflection-btn').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const courseId = this.dataset.courseId;
+                    const lessonId = this.dataset.lessonId;
+                    
+                    if (confirm('Are you sure you want to delete this reflection?')) {
+                        try {
+                            await window.learningJournal.deleteReflection(courseId, lessonId);
+                            loadLearningJournal(); // Reload journal
+                        } catch (error) {
+                            console.error('Error deleting reflection:', error);
+                        }
+                    }
+                });
+            });
+            
+            // Add event listeners for view full buttons
+            document.querySelectorAll('.view-full-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const fullText = this.dataset.fullText.replace(/&quot;/g, '"');
+                    showFullReflectionModal(fullText);
+                });
+            });
+            
+        } catch (error) {
+            console.error('Error loading journal:', error);
+            journalContainer.innerHTML = `
+                <div class="text-center py-8">
+                    <svg class="mx-auto h-12 w-12 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 class="mt-2 text-lg font-medium text-gray-900">Error loading reflections</h3>
+                    <p class="mt-1 text-gray-500">Please try again later</p>
+                </div>
+            `;
+        }
+    }
+
+    // Show full reflection modal
+    function showFullReflectionModal(text) {
+        const modalHTML = `
+            <div id="full-reflection-modal" class="fixed inset-0 z-50 overflow-y-auto">
+                <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+                    <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+                    <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full sm:p-6">
+                        <div class="absolute top-0 right-0 pt-4 pr-4">
+                            <button id="close-full-modal" class="text-gray-400 hover:text-gray-500">
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="mt-3">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Full Reflection</h3>
+                            <div class="bg-gray-50 p-4 rounded-lg max-h-96 overflow-y-auto">
+                                <p class="text-gray-700 whitespace-pre-wrap">${text}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        const modalContainer = document.createElement('div');
+        modalContainer.innerHTML = modalHTML;
+        document.body.appendChild(modalContainer);
+        
+        document.getElementById('close-full-modal').addEventListener('click', () => {
+            document.body.removeChild(modalContainer);
+        });
+        
+        document.getElementById('full-reflection-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'full-reflection-modal') {
+                document.body.removeChild(modalContainer);
+            }
+        });
+    }
+
     // Check auth state
     firebaseServices.onAuthStateChanged((user) => {
         if (user) {
@@ -653,6 +849,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Initialize Learning Challenges system
             initializeLearningChallenges();
+            
+            // Load learning journal
+            setTimeout(() => {
+                loadLearningJournal();
+            }, 1000);
         } else {
             // User is signed out
             console.log('User is signed out');
@@ -995,7 +1196,7 @@ document.addEventListener('DOMContentLoaded', function() {
         switch (achievement.icon) {
             case 'beginner':
                 iconHTML = `
-                    <svg class="w-12 h-12 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="w-12 h-12 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                 `;
@@ -1573,7 +1774,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         alt="${enrollment.course.title}" 
                         class="w-full h-full object-cover"
                         loading="lazy"
-                        onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHg9IjMiIHk9IjQiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxMyIgcng9IjIiLz48cG9seWxpbmUgcG9pbnRzPSIxIDIwIDggMTMgMTMgMTgiLz48cG9seWxpbmUgcG9pbnRzPSIyMSAyMCAxNi41IDE1LjUgMTQgMTgiLz48bGluZSB4MT0iOSIgeDI9IjkiIHkxPSI5IiB5Mj0iOSIvPjwvc3ZnPg==';"
+                        onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHg9IjMiIHk9IjQiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxMyIgcng9IjIiLz48cG9seWxpbmUgcG9pbnRzPSIxIDIwIDggMTMgMTMgMTgiLz48cG9seWxpbmUgcG9pbnRzPSIyMSAyMCAxNi41IDE1LjUgMTQgMTgiLz48bGluZSB4MT0iOSIgeGI9IjkiIHkxPSI5IiB5Mj0iOSIvPjwvc3ZnPg==';"
                     >
                 </div>
                 
