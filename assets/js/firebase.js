@@ -314,6 +314,82 @@ window.firebaseServices = {
         }
     },
 
+    // Collection functions for Firebase integration
+    getUserCollections: async (userId) => {
+        try {
+            const collectionsRef = ref(rtdb, `users/${userId}/collections`);
+            const snapshot = await get(collectionsRef);
+            
+            if (snapshot.exists()) {
+                const collectionsData = snapshot.val();
+                const collections = [];
+                
+                Object.keys(collectionsData).forEach(key => {
+                    collections.push({ id: key, ...collectionsData[key] });
+                });
+                
+                return collections;
+            }
+            return [];
+        } catch (error) {
+            console.error('Error getting user collections:', error);
+            throw error;
+        }
+    },
+
+    saveUserCollections: async (userId, collections) => {
+        try {
+            const collectionsRef = ref(rtdb, `users/${userId}/collections`);
+            
+            // Convert array to object with collection IDs as keys
+            const collectionsObject = {};
+            collections.forEach(collection => {
+                collectionsObject[collection.id] = collection;
+            });
+            
+            await set(collectionsRef, collectionsObject);
+            return true;
+        } catch (error) {
+            console.error('Error saving user collections:', error);
+            throw error;
+        }
+    },
+
+    saveCollection: async (userId, collection) => {
+        try {
+            const collectionRef = ref(rtdb, `users/${userId}/collections/${collection.id}`);
+            await set(collectionRef, collection);
+            return collection;
+        } catch (error) {
+            console.error('Error saving collection:', error);
+            throw error;
+        }
+    },
+
+    deleteCollectionFromFirebase: async (userId, collectionId) => {
+        try {
+            const collectionRef = ref(rtdb, `users/${userId}/collections/${collectionId}`);
+            await remove(collectionRef);
+            return true;
+        } catch (error) {
+            console.error('Error deleting collection from Firebase:', error);
+            throw error;
+        }
+    },
+
+    // Get public collections for sharing
+    getPublicCollections: async () => {
+        try {
+            // This would require a more complex query structure
+            // For simplicity, we'll implement this as needed
+            console.log('Getting public collections - feature pending implementation');
+            return [];
+        } catch (error) {
+            console.error('Error getting public collections:', error);
+            throw error;
+        }
+    },
+
     // Helper functions for data operations
     getCourses: async () => {
         try {

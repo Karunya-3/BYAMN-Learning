@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Collections - Learning Platform</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="collections.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex-shrink-0 flex items-center">
+                        <span class="text-2xl font-bold text-indigo-600">LearnHub</span>
+                    </a>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="index.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Home</a>
+                        <a href="courses.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Courses</a>
+                        <a href="collections.html" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">My Collections</a>
+                        <a href="profile.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Profile</a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <!-- User menu -->
+                    <div id="user-menu"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">My Collections</h1>
+                    <p class="mt-2 text-gray-600">Organize your courses into personalized learning paths</p>
+                </div>
+                <button onclick="window.collections.showCreateCollectionModal()"
+                        class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Create Collection
+                </button>
+            </div>
+        </div>
+
+        <!-- Collections Grid -->
+        <div id="collections-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Collections will be loaded here -->
+            <div class="text-center py-20">
+                <div class="loading-spinner mx-auto"></div>
+                <p class="mt-4 text-gray-700 font-semibold">Loading collections...</p>
+            </div>
+        </div>
+
+        <!-- Empty State (hidden by default) -->
+        <div id="empty-collections-state" class="hidden text-center py-20">
+            <svg class="mx-auto h-24 w-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+            </svg>
+            <h3 class="mt-6 text-2xl font-bold text-gray-900">No collections yet</h3>
+            <p class="mt-3 text-gray-600 max-w-md mx-auto">Create your first collection to organize courses into personalized learning paths</p>
+            <div class="mt-8">
+                <button onclick="window.collections.showCreateCollectionModal()"
+                        class="px-8 py-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition duration-300 shadow-md hover:shadow-lg flex items-center gap-2 mx-auto">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Create Your First Collection
+                </button>
+            </div>
+        </div>
+
+        <!-- Collection View (hidden by default) -->
+        <div id="collection-detail-view" class="hidden">
+            <!-- Collection detail will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="firebase.js"></script>
+    <script src="utils.js"></script>
+    <script src="auth.js"></script>
+    <script src="collections.js"></script>
+    <script>
+        // Initialize collections when page loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check auth
+            const user = await checkAuth();
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Initialize collections
+            if (window.collections && window.collections.initCollections) {
+                await window.collections.initCollections();
+                renderCollectionsPage();
+            }
+        });
+
+        // Render collections page
+        async function renderCollectionsPage() {
+            const container = document.getElementById('collections-container');
+            const emptyState = document.getElementById('empty-collections-state');
+            
+            if (!container) return;
+
+            // Get collections from global variable
+            const collections = window.collections ? window.collections.userCollections : [];
+            
+            if (collections.length === 0) {
+                container.innerHTML = '';
+                if (emptyState) emptyState.classList.remove('hidden');
+                return;
+            }
+
+            if (emptyState) emptyState.classList.add('hidden');
+
+            let collectionsHTML = '';
+            
+            collections.forEach(collection => {
+                const date = new Date(collection.createdAt);
+                const formattedDate = date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+
+                collectionsHTML += `
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden hover-lift transition-all duration-300">
+                        <div class="h-48 overflow-hidden relative">
+                            ${collection.thumbnail ? 
+                                `<img src="${collection.thumbnail}" alt="${collection.name}" class="w-full h-full object-cover">` :
+                                `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-100 to-purple-100">
+                                    <svg class="w-16 h-16 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                                    </svg>
+                                </div>`
+                            }
+                            ${collection.isPublic ? 
+                                `<span class="absolute top-4 right-4 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                                    Public
+                                </span>` : 
+                                `<span class="absolute top-4 right-4 bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                                    Private
+                                </span>`
+                            }
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">${collection.name}</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-2">${collection.description || 'No description'}</p>
+                            
+                            <div class="flex items-center justify-between text-sm text-gray-500 mb-6">
+                                <span>${collection.courseCount || 0} courses</span>
+                                <span>Created ${formattedDate}</span>
+                            </div>
+                            
+                            <div class="flex space-x-3">
+                                <button onclick="window.collections.viewCollection('${collection.id}')"
+                                        class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                                    View Collection
+                                </button>
+                                <button onclick="window.collections.showEditCollectionModal('${collection.id}')"
+                                        class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                                    Edit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = collectionsHTML;
+        }
+
+        // Handle back to collections list
+        function backToCollectionsList() {
+            document.getElementById('collection-detail-view').classList.add('hidden');
+            document.getElementById('collections-container').classList.remove('hidden');
+            document.getElementById('empty-collections-state').classList.remove('hidden');
+            renderCollectionsPage();
+        }
+    </script>
+</body>
+</html>
