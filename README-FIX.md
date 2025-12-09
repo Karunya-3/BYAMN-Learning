@@ -12,6 +12,7 @@ I've created a tool to load the demo data from `firebase_data_demo.json` into yo
 
 ## Steps to Fix
 
+
 1. **Open the demo data loader:**
    - Open `load-demo-data.html` in your browser
    - This file is located in the root of the BYAMN-Learning directory

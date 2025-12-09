@@ -872,6 +872,7 @@ async function loadAvailableCoursesForCollection(collectionId) {
     const container = document.getElementById('add-courses-container');
     if (!container) return;
     
+    
     container.innerHTML = `
         <div class="col-span-full text-center py-10">
             <div class="loading-spinner mx-auto"></div>

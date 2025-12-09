@@ -11,6 +11,7 @@ class LearningPathVisualizer {
         this.visualizationType = 'roadmap'; // 'roadmap' or 'recommendations'
         this.isInitialized = false;
     }
+    
 
     // Initialize the learning path visualizer
     async init(userId) {

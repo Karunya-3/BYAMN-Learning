@@ -4185,3 +4185,384 @@ body.theme-transition * {
         height: 8px;
     }
 }
+
+/* Add these styles to the end of styles.css */
+
+/* Print-specific styles */
+@media print {
+    /* Hide navigation and unnecessary elements */
+    header, 
+    footer, 
+    .user-actions-desktop,
+    .user-actions-mobile,
+    .mobile-menu-button,
+    #mobile-menu,
+    nav:not(.print-nav),
+    .theme-toggle,
+    .btn:not(.print-btn),
+    .video-player,
+    .video-container,
+    .search-bar,
+    .category-filters,
+    #sort-options,
+    .hero-section,
+    .feature-cards,
+    .stats-cards,
+    .social-sharing,
+    .newsletter-section {
+        display: none !important;
+    }
+    
+    /* Reset body for printing */
+    body {
+        background: white !important;
+        color: black !important;
+        font-size: 12pt !important;
+        line-height: 1.5 !important;
+        margin: 0 !important;
+        padding: 20px !important;
+    }
+    
+    /* Print container */
+    .print-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+    }
+    
+    /* Headings */
+    h1, h2, h3, h4 {
+        color: black !important;
+        page-break-after: avoid !important;
+    }
+    
+    h1 {
+        font-size: 24pt !important;
+        margin-bottom: 20px !important;
+    }
+    
+    h2 {
+        font-size: 18pt !important;
+        margin: 15px 0 10px 0 !important;
+    }
+    
+    h3 {
+        font-size: 16pt !important;
+        margin: 12px 0 8px 0 !important;
+    }
+    
+    /* Links */
+    a {
+        color: #0000EE !important;
+        text-decoration: underline !important;
+    }
+    
+    /* Show URLs after links */
+    a[href^="http"]:after {
+        content: " (" attr(href) ")";
+        font-size: 10pt;
+        color: #666;
+    }
+    
+    /* Lists */
+    ul, ol {
+        margin: 10px 0 !important;
+        padding-left: 30px !important;
+    }
+    
+    li {
+        margin: 5px 0 !important;
+        page-break-inside: avoid !important;
+    }
+    
+    /* Tables */
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin: 15px 0 !important;
+        page-break-inside: avoid !important;
+    }
+    
+    th, td {
+        border: 1px solid #000 !important;
+        padding: 8px !important;
+        text-align: left !important;
+    }
+    
+    th {
+        background-color: #f2f2f2 !important;
+        font-weight: bold !important;
+    }
+    
+    /* Page breaks */
+    .page-break {
+        page-break-before: always !important;
+    }
+    
+    .avoid-break {
+        page-break-inside: avoid !important;
+    }
+    
+    /* Print header and footer */
+    .print-header {
+        text-align: center;
+        border-bottom: 2px solid #000;
+        padding-bottom: 15px;
+        margin-bottom: 25px;
+    }
+    
+    .print-footer {
+        text-align: center;
+        border-top: 1px solid #000;
+        padding-top: 10px;
+        margin-top: 20px;
+        font-size: 10pt;
+        color: #666;
+    }
+    
+    /* Progress bars for print */
+    .progress-bar-print {
+        height: 20px;
+        background-color: #f0f0f0;
+        border: 1px solid #000;
+        border-radius: 3px;
+        overflow: hidden;
+        margin: 10px 0;
+    }
+    
+    .progress-fill-print {
+        height: 100%;
+        background-color: #4f46e5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 10pt;
+    }
+    
+    /* Certificate preview for print */
+    .certificate-preview-print {
+        border: 2px solid #000;
+        padding: 20px;
+        margin: 20px 0;
+        text-align: center;
+    }
+    
+    /* Notes sections */
+    .lesson-notes {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin: 15px 0;
+        background-color: #f9f9f9;
+        page-break-inside: avoid;
+    }
+    
+    .notes-timestamp {
+        font-size: 10pt;
+        color: #666;
+        margin-bottom: 10px;
+    }
+}
+
+/* Screen-only styles for print buttons */
+@media screen {
+    .print-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 16px;
+        margin: 5px;
+    }
+    
+    .print-btn:hover {
+        background-color: #f0f0f0;
+    }
+    
+    .print-options {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        padding: 10px;
+    }
+}
+
+/* Calendar Integration Styles */
+.calendar-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    background: #10b981;
+    color: white;
+    border-radius: 6px;
+    border: none;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.calendar-btn:hover {
+    background: #059669;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+}
+
+.calendar-btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+}
+
+.calendar-btn-outline {
+    background: transparent;
+    border: 1px solid #6366f1;
+    color: #6366f1;
+}
+
+.calendar-btn-outline:hover {
+    background: #6366f1;
+    color: white;
+}
+
+.quick-schedule-btn {
+    padding: 0.5rem;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.quick-schedule-btn:hover {
+    background: #e5e7eb;
+    transform: translateY(-1px);
+}
+
+.calendar-event-item {
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 8px;
+    border-left: 4px solid #6366f1;
+    transition: all 0.2s ease;
+}
+
+.calendar-event-item:hover {
+    background: #f3f4f6;
+    transform: translateX(2px);
+}
+
+/* Calendar Modal Styles (already added via JS, but here as backup) */
+.calendar-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.calendar-modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Animation for calendar buttons */
+@keyframes pulse-calendar {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+    }
+}
+
+.calendar-btn-pulse {
+    animation: pulse-calendar 2s infinite;
+}
+
+/* Responsive styles */
+@media (max-width: 640px) {
+    .calendar-options-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .quick-schedule-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Learning Journal Styles */
+.reflection-card {
+    transition: all 0.2s ease;
+    border-left: 4px solid #6366f1;
+}
+
+.reflection-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+}
+
+.reflection-date {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.reflection-text {
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+/* Reflection Modal Styles */
+#reflection-modal textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+#reflection-modal textarea:focus {
+    outline: none;
+    ring: 2px solid #6366f1;
+}
+
+/* Journal Entry Styles */
+.journal-entry {
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.journal-entry::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.5rem;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #6366f1;
+}
+
+/* Animation for new reflection */
+@keyframes highlightReflection {
+    0% { background-color: rgba(99, 102, 241, 0.1); }
+    100% { background-color: transparent; }
+}
+
+.highlight-new {
+    animation: highlightReflection 2s ease-out;
+}

@@ -410,7 +410,7 @@ async function loadCourseReviews(courseId) {
                     <p class="text-sm text-gray-600 line-clamp-2">${review.comment || 'No comment provided.'}</p>
                 </div>
             `;
-        });
+        }); 
         
         if (reviews.length > 2) {
             reviewsHTML += `
@@ -1863,3 +1863,5 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+

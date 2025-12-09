@@ -189,6 +189,110 @@ class LanguageDetector {
 // Initialize language detector globally
 window.languageDetector = new LanguageDetector();
 
+// Initialize PrintUtils
+let printUtils = null;
+
+function initPrintUtils() {
+    if (typeof PrintUtils !== 'undefined') {
+        printUtils = new PrintUtils();
+        console.log('Print utilities initialized');
+        
+        // Add print buttons to course player if it exists
+        setTimeout(addPrintButtonsToCoursePlayer, 1000);
+        
+        // Add print button to dashboard if it exists
+        setTimeout(addPrintButtonsToDashboard, 1000);
+    }
+}
+
+function addPrintButtonsToCoursePlayer() {
+    const lessonInfoSection = document.querySelector('.lesson-info');
+    if (lessonInfoSection) {
+        // Add print notes button
+        const printNotesBtn = document.createElement('button');
+        printNotesBtn.className = 'btn btn-outline print-btn';
+        printNotesBtn.innerHTML = `
+            <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            Print Notes
+        `;
+        printNotesBtn.onclick = printCurrentLessonNotes;
+        
+        const actionsDiv = lessonInfoSection.querySelector('.actions');
+        if (actionsDiv) {
+            actionsDiv.appendChild(printNotesBtn);
+        }
+    }
+}
+
+function addPrintButtonsToDashboard() {
+    const dashboardStats = document.querySelector('.stats-grid');
+    if (dashboardStats && printUtils) {
+        const printDashboardBtn = document.createElement('button');
+        printDashboardBtn.className = 'btn btn-outline print-btn mt-4';
+        printDashboardBtn.innerHTML = `
+            <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            Print Dashboard Summary
+        `;
+        printDashboardBtn.onclick = printDashboardSummary;
+        
+        dashboardStats.parentNode.insertBefore(printDashboardBtn, dashboardStats.nextSibling);
+    }
+}
+
+function printCurrentLessonNotes() {
+    if (!printUtils) {
+        alert('Print utilities not loaded');
+        return;
+    }
+    
+    const lessonData = {
+        title: document.getElementById('lesson-title')?.textContent || 'Current Lesson',
+        description: document.getElementById('lesson-description')?.textContent || 'No description available',
+        courseTitle: document.querySelector('.course-card-title')?.textContent || 'Current Course',
+        duration: document.getElementById('lesson-duration')?.textContent || 'N/A'
+    };
+    
+    printUtils.printLessonNotes(lessonData);
+}
+
+function printDashboardSummary() {
+    if (!printUtils) {
+        alert('Print utilities not loaded');
+        return;
+    }
+    
+    // Get user data from auth
+    if (typeof firebase !== 'undefined' && firebase.auth()) {
+        const user = firebase.auth().currentUser;
+        if (!user) {
+            alert('Please login to print dashboard');
+            return;
+        }
+        
+        const userData = {
+            displayName: user.displayName,
+            email: user.email
+        };
+        
+        // Get analytics data from dashboard
+        const analytics = {
+            totalStudyTime: parseInt(document.getElementById('study-time')?.textContent?.replace(/[^0-9]/g, '') || 0) * 3600,
+            lessonsCompleted: parseInt(document.getElementById('lessons-completed')?.textContent || 0),
+            coursesCompleted: parseInt(document.getElementById('completed-count')?.textContent || 0),
+            currentStreak: parseInt(document.getElementById('learning-streak')?.textContent || 0),
+            longestStreak: parseInt(document.getElementById('learning-streak')?.textContent || 0) // Simplified
+        };
+        
+        printUtils.printDashboardSummary(userData, analytics);
+    } else {
+        alert('Firebase not available. Please login first.');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // 🌐 Initialize language detection system
     window.languageDetector.initialize();
@@ -230,7 +334,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function toggleMobileMenu() {
-        mobileMenu.classList.toggle('hidden');
+        if (mobileMenu) {
+            mobileMenu.classList.toggle('hidden');
+        }
     }
 
     // Initialize streak system when user logs in
@@ -414,6 +520,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Initialize UI without Firebase for non-auth pages
         updateAuthUI(null);
     }
+    
+    // Load PrintUtils script
+    const script = document.createElement('script');
+    script.src = 'assets/js/print-utils.js';
+    script.onload = initPrintUtils;
+    document.head.appendChild(script);
 });
 
 // text animation
