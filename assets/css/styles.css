@@ -4554,6 +4554,32 @@ body.theme-transition * {
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
 }
 
+/* Contact Page Card Hover Effects */
+.contact-card {
+    transition: all 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+    will-change: transform, box-shadow;
+    box-shadow: 0 12px 30px -12px rgba(15, 23, 42, 0.18);
+}
+
+.contact-card:hover {
+    transform: translateY(-8px) scale(1.015);
+    box-shadow: 0 24px 55px -18px rgba(15, 23, 42, 0.35),
+                0 14px 28px -10px rgba(15, 23, 42, 0.25);
+}
+
+/* Smooth transition for contact cards */
+.contact-card-interactive {
+    transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1),
+                box-shadow 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+    cursor: pointer;
+}
+
+.contact-card-interactive:hover {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 30px 70px -20px rgba(15, 23, 42, 0.4), 
+                0 18px 35px -12px rgba(15, 23, 42, 0.3);
+}
+
 .reflection-date {
     color: #6b7280;
     font-size: 0.875rem;
